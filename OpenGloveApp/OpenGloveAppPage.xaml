@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage 
+    xmlns="http://xamarin.com/schemas/2014/forms" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+    xmlns:local="clr-namespace:OpenGloveApp"
+    x:Class="OpenGloveApp.OpenGloveAppPage">
+
+    <StackLayout
+        Margin="10">
+        
+        <Label 
+            Text="OpenGlove"
+            VerticalOptions="Center"
+            HorizontalOptions="Center"
+            FontSize="Large"/>
+
+        <StackLayout Orientation="Horizontal">
+            <Label Text="Bluetooth state: "/>
+            <Label x:Name="label_bluetooth_status" Text="{Binding Value}"/>    
+        </StackLayout>
+
+        <StackLayout Orientation="Horizontal">
+            <Label Text="Flexor value: "/>
+            <Label x:Name="label_flexor_value" 
+                   Margin="0,0,0,0"
+                   Text="{Binding Value}"/>
+            <ProgressBar 
+                 x:Name="progressBar_flexor_value"
+                 Margin="20,0,10,10"
+                 HorizontalOptions="CenterAndExpand"
+                 Progress="{Binding Value}"
+                 WidthRequest="30"
+                 Scale="5"/>
+        </StackLayout>
+
+        <Button
+            Text="Find bluetooth devices"
+            Clicked="ShowBoundedDevices_Clicked"/>
+
+        <Button 
+            x:Name="buttonActivateMotor"
+            Text="{Binding Value}"
+            Clicked="ButtonActivateMotor_Clicked"/>
+
+        <ListView x:Name="listViewBoundedDevices"
+                  HasUnevenRows="true"
+                  ItemTapped="Handle_ItemTappedAsync"
+                  ItemSelected="Handle_ItemSelected">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextCell Text="{Binding Name}" Detail="{Binding Address}"/>    
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+            
+    </StackLayout>
+</ContentPage>
