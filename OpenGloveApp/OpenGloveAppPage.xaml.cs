@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using OpenGloveApp.OpenGloveAPI;
 using OpenGloveApp.Server;
+using System.Diagnostics;
 
 namespace OpenGloveApp
 {
@@ -30,12 +31,12 @@ namespace OpenGloveApp
 
         // Flexor pins: 17 and  + and -
         public List<int> mFlexorPins = new List<int> { 17 };
-        public List<int> mFlexorMapping = new List<int> { 8 };
+        public List<int> mFlexorMapping = new List<int> { 8 }; //values of 0 to 10 for flexor mapping
         public List<string> mFlexorPinsMode = new List<string> { "OUTPUT" };
 
         public OpenGlove mOpenGlove = new OpenGlove();
-        public OpenGloveServer mServer = new OpenGloveServer("ws://127.0.0.1:8181");
-            
+        public OpenGloveServer mServer = new OpenGloveServer("ws://127.0.0.1:7070"); //127.0.0.1 = localhost
+
         public OpenGloveAppPage()
         {
             InitializeComponent();
@@ -51,11 +52,63 @@ namespace OpenGloveApp
             {
                 if (e.Message != null)
                 {
-                    double value = double.Parse(e.Message);
-                    progressBar_flexor_value.Progress = (value / 300);
-                    label_flexor_value.Text = e.Message;
+                    OnBluetoothMessageHandler(e);
+                    Debug.WriteLine(e.Message);
                 }
             });
+        }
+
+        public void OnBluetoothMessageHandler(BluetoothEventArgs e)
+        {
+            int mapping, value;
+            float valueX, valueY, valueZ;
+            string[] words;
+
+            if (e.Message != null)
+            {
+                words = e.Message.Split(',');
+                try
+                {
+                    switch (words[0])
+                    {
+                        case "f":
+                            mapping = Int32.Parse(words[1]);
+                            value = Int32.Parse(words[2]);
+                            progressBar_flexor_value.Progress = value;
+                            label_flexor_value.Text = value.ToString();
+                            //fingersFunction?.Invoke(mapping, value);
+                            break;
+                        case "a":
+                            valueX = float.Parse(words[1]);
+                            valueY = float.Parse(words[2]);
+                            valueZ = float.Parse(words[3]);
+                            //accelerometerFunction?.Invoke(valueX, valueY, valueZ);
+                            break;
+                        case "g":
+                            valueX = float.Parse(words[1]);
+                            valueY = float.Parse(words[2]);
+                            valueZ = float.Parse(words[3]);
+                            //gyroscopeFunction?.Invoke(valueX, valueY, valueZ);
+                            break;
+                        case "m":
+                            valueX = float.Parse(words[1]);
+                            valueY = float.Parse(words[2]);
+                            valueZ = float.Parse(words[3]);
+                            //magnometerFunction?.Invoke(valueX, valueY, valueZ);
+                            break;
+                        case "z":
+                            //imu_ValuesFunction?.Invoke(float.Parse(words[1]), float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4]), float.Parse(words[5]), float.Parse(words[6]), float.Parse(words[7]), float.Parse(words[8]), float.Parse(words[9]));
+                            break;
+                        default:
+                            break;
+                    }
+
+                }
+                catch
+                {
+                    Debug.WriteLine("ERROR: BAD FORMAT");
+                }
+            }
         }
 
         // Method to raise event
@@ -104,7 +157,9 @@ namespace OpenGloveApp
 
             //Blocking call
             if (connect)
-                mOpenGlove.OpenDeviceConnection(this, device);
+            {
+                mOpenGlove.OpenDeviceConnection(this, device); //Blocking call
+            }
         }
     }
 }

@@ -21,6 +21,7 @@ namespace OpenGloveApp.Droid
         private BluetoothDevice mDevice;
         private List<BluetoothDevices> mBoundedDevicesModel;
         private Hashtable mBoundedDevices = new Hashtable();
+        private static ConnectedThread mBluetoothManagement;
 
         public Communication()
         {
@@ -86,14 +87,14 @@ namespace OpenGloveApp.Droid
             throw new NotImplementedException();
         }
 
-        public void Write(string data)
+        public void Write(string message)
         {
-            throw new NotImplementedException();
+            mBluetoothManagement.Write(message);
         }
 
         public string ReadLine()
         {
-            throw new NotImplementedException();
+            return mBluetoothManagement.ReadLine();
         }
 
         public void ClosePort()
@@ -101,7 +102,7 @@ namespace OpenGloveApp.Droid
             throw new NotImplementedException();
         }
 
-        private class ConnectThread : Java.Lang.Thread
+        public class ConnectThread : Java.Lang.Thread
         {
             private BluetoothSocket mmSocket;
             private BluetoothDevice mmDevice;
@@ -144,8 +145,8 @@ namespace OpenGloveApp.Droid
                     Debug.WriteLine("BluetoothSocket: CONNECTED");
                     // Do work to manage the connection (in a separate thread)
                     // TODO manageConnectedSocket(mmSocket);
-                    ConnectedThread connectedThread = new ConnectedThread(mmContentPage, mmSocket);
-                    connectedThread.Start();
+                    mBluetoothManagement = new ConnectedThread(mmContentPage, mmSocket);
+                    mBluetoothManagement.Start();
                 }
                 catch (Java.IO.IOException e)
                 {
@@ -157,7 +158,7 @@ namespace OpenGloveApp.Droid
         }
 
 
-        private class ConnectedThread : Java.Lang.Thread
+        public class ConnectedThread : Java.Lang.Thread
         {
             // Event for send data to UI thread on Main Xamarin.Forms project
             public event EventHandler<BluetoothEventArgs> BluetoothDataReceived;
@@ -190,7 +191,7 @@ namespace OpenGloveApp.Droid
                 }
             }
 
-            // Method for raise the event 
+            // Method for raise the event: UI, WebSocket Server
             protected virtual void OnBluetootDataReceived(long threadId, string message)
             {
                 if (BluetoothDataReceived != null)
@@ -278,11 +279,15 @@ namespace OpenGloveApp.Droid
             {
                 // Keep listening to the InputStream whit a StreamReader until an exception occurs
                 string line;
+                // TODO CHangue this for a Load Configuration on OpenGlove
+                // 1 a 10
+                this.Write(mMessageGenerator.addFlexor(mFlexorPins[0], 1));
                 while (true)
                 {
                     try
                     {
-                        line = AnalogRead(mFlexorPins[0]);
+                        //line = AnalogRead(mFlexorPins[0]);
+                        line = ReadLine();
 
                         if (line != null)
                         {
@@ -418,6 +423,19 @@ namespace OpenGloveApp.Droid
             {
                 string message = mMessageGenerator.AnalogRead(pin);
                 this.Write(message);
+                try
+                {
+                    return mmInputStreamReader.ReadLine();
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e.Message);
+                    return null;
+                }
+            }
+
+            public string ReadLine()
+            {
                 try
                 {
                     return mmInputStreamReader.ReadLine();

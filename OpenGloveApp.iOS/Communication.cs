@@ -40,7 +40,7 @@ namespace OpenGloveApp.Droid
             throw new NotImplementedException();
         }
 
-        public void Write(string data)
+        public void Write(string message)
         {
             throw new NotImplementedException();
         }
