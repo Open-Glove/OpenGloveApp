@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using OpenGloveApp.Models;
 using Xamarin.Forms;
-//using System.Text.RegularExpressions; // use in Communication for windows
 
 namespace OpenGloveApp.OpenGloveAPI
 {
@@ -37,7 +37,7 @@ namespace OpenGloveApp.OpenGloveAPI
         /// Send the string to the serial port
         /// </summary>
         /// <param name="data">String data to send</param>
-        void Write(string data);
+        void Write(string message);
         /// <summary>
         /// Read the input buffet until a next line character
         /// </summary>
