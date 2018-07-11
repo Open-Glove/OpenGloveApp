@@ -1,4 +1,5 @@
 using System;
+using OpenGloveApp.Pages;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -10,8 +11,13 @@ namespace OpenGloveApp
         public App()
         {
             InitializeComponent();
+            NavigationPage navigationPage = new NavigationPage(new Home())
+            {
+                BarTextColor = Color.White,
+                BarBackgroundColor = Color.FromHex(AppConstants.Colors.ColorPrimary)
+            };
 
-            MainPage = new OpenGloveAppPage();
+            MainPage = navigationPage;
         }
 
         protected override void OnStart()

@@ -4,9 +4,9 @@
         <color android:color="#FFFFFF"/>
      </item>
      <item>
-     <bitmap
-        android:src="@drawable/web_hi_res_512"
-        android:tileMode="disabled"
-        android:gravity="center"/>
+         <bitmap
+            android:src="@drawable/logo_splash_screen"
+            android:tileMode="disabled"
+            android:gravity="center"/>
      </item>
  </layer-list>

@@ -35,13 +35,13 @@ namespace OpenGloveApp
         public List<string> mFlexorPinsMode = new List<string> { "OUTPUT" };
 
         public OpenGlove mOpenGlove = new OpenGlove();
-        public OpenGloveServer mServer = new OpenGloveServer("ws://127.0.0.1:7070"); //127.0.0.1 = localhost
+        //public OpenGloveServer mServer = new OpenGloveServer("ws://127.0.0.1:7070"); //127.0.0.1 = localhost
 
         public OpenGloveAppPage()
         {
             InitializeComponent();
             buttonActivateMotor.Text = "Motor OFF";
-            mServer.Start();
+            //mServer.Start();
         }
 
         //Subcriber method

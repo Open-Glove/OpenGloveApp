@@ -1,8 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="OpenGloveApp.Pages.Home">
+<xf:BottomBarPage
+    Title="Configuration"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="OpenGloveApp.Pages.Home"
+    xmlns:xf="clr-namespace:BottomBar.XamarinForms"
+    xmlns:local='clr-namespace:Pages'>
+
+
+    <ContentPage Title="Configuration" Padding="0,20,0,0" Icon="ic_settings">
+        <ContentPage.Content>
+            <StackLayout Orientation="Vertical">
+
+                <Image Source="ic_settings_green"/>
+                
+                <Label 
+                    Text="Home"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"/>
+
+                <Entry
+                    Text="Input text"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"/>
+                
+            </StackLayout>
+        </ContentPage.Content>
+    </ContentPage>
+
+    <ContentPage Title="Devices" Padding="0,20,0,0" Icon="ic_bluetooth">
     <ContentPage.Content>
-        <Label 
-            Text="Home"
-            VerticalOptions="Center"/>
+        <StackLayout Orientation="Vertical">
+
+            <Label 
+                Text="Devices"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"/>
+
+            <Entry
+                Text="Input text"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"/>
+            
+        </StackLayout>
     </ContentPage.Content>
-</ContentPage>
+    </ContentPage>
+
+    <ContentPage Title="Server" Padding="0,20,0,0" Icon="ic_dvr">
+        <ContentPage.Content>
+            <StackLayout Orientation="Vertical">
+
+                <Label 
+                    Text="Server"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"/>
+
+                <Entry
+                    Text="Input text"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"/>
+                
+            </StackLayout>
+        </ContentPage.Content>
+        </ContentPage>
+</xf:BottomBarPage>
