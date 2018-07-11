@@ -136,6 +136,9 @@
     <PackageReference Include="PCLStorage">
       <Version>1.0.2</Version>
     </PackageReference>
+    <PackageReference Include="Xam.Plugins.Forms.ImageCircle">
+      <Version>3.0.0.5</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
@@ -187,5 +190,8 @@
     <BundleResource Include="Resources\ic_bluetooth_green.png" />
     <BundleResource Include="Resources\ic_bluetooth_green%402x.png" />
     <BundleResource Include="Resources\ic_bluetooth_green%403x.png" />
+    <BundleResource Include="Resources\board.png" />
+    <BundleResource Include="Resources\board%402x.png" />
+    <BundleResource Include="Resources\board%403x.png" />
   </ItemGroup>
 </Project>

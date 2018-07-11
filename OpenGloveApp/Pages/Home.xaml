@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Class="OpenGloveApp.Pages.Home"
     xmlns:xf="clr-namespace:BottomBar.XamarinForms"
+    xmlns:ic="clr-namespace:ImageCircle.Forms.Plugin.Abstractions;assembly=ImageCircle.Forms.Plugin"
     xmlns:local='clr-namespace:Pages'>
 
 
@@ -12,17 +13,52 @@
         <ContentPage.Content>
             <StackLayout Orientation="Vertical">
 
-                <Image Source="ic_settings_green"/>
-                
-                <Label 
-                    Text="Home"
+            <Grid VerticalOptions="CenterAndExpand" RowSpacing="40">
+    
+                <ic:CircleImage 
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    WidthRequest="80"
+                    HeightRequest="80"
+                    Aspect="AspectFill"
+                    Source="board"
+                    HorizontalOptions="Center"
                     VerticalOptions="Center"
-                    HorizontalOptions="Center"/>
+                    />
+                <ic:CircleImage
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    WidthRequest="80"
+                    HeightRequest="80"
+                    Aspect="AspectFill"
+                    Source="actuator_mapping_back"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    />
 
-                <Entry
-                    Text="Input text"
+                <ic:CircleImage 
+                    Grid.Row="0"
+                    Grid.Column="2"
+                    WidthRequest="80"
+                    HeightRequest="80"
+                    Aspect="AspectFill"
+                    Source="flexor_mapping"
+                    HorizontalOptions="Center"
                     VerticalOptions="Center"
-                    HorizontalOptions="Center"/>
+                    />
+
+                <ic:CircleImage
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    WidthRequest="80"
+                    HeightRequest="80"
+                    Aspect="AspectFill"
+                    Source="IMU_sensor"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    />
+                    
+            </Grid>
                 
             </StackLayout>
         </ContentPage.Content>
@@ -31,7 +67,7 @@
     <ContentPage Title="Devices" Padding="0,20,0,0" Icon="ic_bluetooth">
     <ContentPage.Content>
         <StackLayout Orientation="Vertical">
-
+                
             <Label 
                 Text="Devices"
                 VerticalOptions="Center"

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Foundation;
+using ImageCircle.Forms.Plugin.iOS;
 using UIKit;
 
 namespace OpenGloveApp.iOS
@@ -22,12 +23,13 @@ namespace OpenGloveApp.iOS
         //
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
-            // tab bar #07bf94
             UITabBar.Appearance.SelectedImageTintColor = UIColor.FromRGB(0x07, 0xBF, 0x94); // green
                                                                                             // switch
             UISwitch.Appearance.OnTintColor = UIColor.FromRGB(0x91, 0xCA, 0x47); // green
 
             global::Xamarin.Forms.Forms.Init();
+            ImageCircleRenderer.Init();
+
             LoadApplication(new App());
 
             return base.FinishedLaunching(app, options);

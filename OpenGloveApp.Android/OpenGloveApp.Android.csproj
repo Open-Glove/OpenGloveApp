@@ -60,6 +60,9 @@
     <PackageReference Include="PCLStorage">
       <Version>1.0.2</Version>
     </PackageReference>
+    <PackageReference Include="Xam.Plugins.Forms.ImageCircle">
+      <Version>3.0.0.5</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainActivity.cs" />
@@ -163,6 +166,11 @@
     <AndroidResource Include="Resources\drawable\ic_more_vert_white.png" />
     <AndroidResource Include="Resources\drawable\ic_settings.png" />
     <AndroidResource Include="Resources\drawable\ic_settings_green.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\board.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\board.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\board.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\board.png" />
+    <AndroidResource Include="Resources\drawable\board.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
