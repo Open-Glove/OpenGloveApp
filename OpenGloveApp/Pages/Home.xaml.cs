@@ -1,4 +1,7 @@
-﻿using BottomBar.XamarinForms;
+﻿using System;
+using System.Diagnostics;
+using BottomBar.XamarinForms;
+using OpenGloveApp.Extensions;
 using Xamarin.Forms;
 using static OpenGloveApp.AppConstants.AppConstants;
 
@@ -19,6 +22,16 @@ namespace OpenGloveApp.Pages
                 default:
                     break;
             }
+
+
+
+        }
+
+        protected override void OnCurrentPageChanged()
+        {
+            base.OnCurrentPageChanged();
+            var pages = Children.GetEnumerator();
+            this.Title = CurrentPage.Title;
         }
     }
 }

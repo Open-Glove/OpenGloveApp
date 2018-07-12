@@ -5,9 +5,9 @@ using Xamarin.Forms;
 
 namespace OpenGloveApp.Pages
 {
-    public partial class ServerPage : ContentPage
+    public partial class BoardsPage : ContentPage
     {
-        public ServerPage()
+        public BoardsPage()
         {
             InitializeComponent();
         }

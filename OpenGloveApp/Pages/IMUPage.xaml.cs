@@ -5,13 +5,11 @@ using Xamarin.Forms;
 
 namespace OpenGloveApp.Pages
 {
-    public partial class Device : ContentPage
+    public partial class IMUPage : ContentPage
     {
-        public Device()
+        public IMUPage()
         {
             InitializeComponent();
         }
-
-        public static int RuntimePlatform { get; internal set; }
     }
 }

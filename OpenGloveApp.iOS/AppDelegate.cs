@@ -26,6 +26,7 @@ namespace OpenGloveApp.iOS
             UITabBar.Appearance.SelectedImageTintColor = UIColor.FromRGB(0x07, 0xBF, 0x94); // green
                                                                                             // switch
             UISwitch.Appearance.OnTintColor = UIColor.FromRGB(0x91, 0xCA, 0x47); // green
+            UILabel.Appearance.TextColor = UIColor.FromRGB(0x73, 0x74, 0x74); // gray
 
             global::Xamarin.Forms.Forms.Init();
             ImageCircleRenderer.Init();
