@@ -43,9 +43,7 @@ namespace OpenGloveApp.Extensions
 
         public async Task OnImageClicked(object source, System.EventArgs e)
         {
-            uint ms = 40;
-            await ((ImageCircleTouchable)source).ScaleTo(0.9, ms/2);
-            await ((ImageCircleTouchable)source).ScaleTo(1, ms/2);
+            await Animations.AnimationTouch((View)source);
             this.OnMenuItemClicked();
         }
 

@@ -15,6 +15,7 @@
     <Folder Include="WebSocketServer\" />
     <Folder Include="Pages\" />
     <Folder Include="Extensions\" />
+    <Folder Include="Pages\CustomListItem\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Pages\DevicePage.xaml.cs" />

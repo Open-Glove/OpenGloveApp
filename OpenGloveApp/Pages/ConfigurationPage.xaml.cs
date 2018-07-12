@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using OpenGloveApp.Extensions;
 using Xamarin.Forms;
 
@@ -6,19 +7,27 @@ namespace OpenGloveApp.Pages
 {
     public partial class ConfigurationPage : ContentPage
     {
+        public static List<string> OpenGloveConfigurations = new List<string> {"OpenGloveIZQ.xml", "OpenGloveDER.xml", "Helmet.xml", "Jacket"};
         public ConfigurationPage()
         {
             InitializeComponent();
 
-            Color gridBackGroundColor = Color.Transparent; // changue this color for design the layout
-            Color itemBackGroundColor = Color.Transparent; // changue this color for design the layout
+            pickerCurrentConfiguration.ItemsSource = OpenGloveConfigurations;
+
+            BuildGridMenuItems();
+        }
+
+        public void BuildGridMenuItems()
+        {
+            Color gridBackGroundColor = Color.Transparent; // changue this color for design the grid layout
+            Color itemBackGroundColor = Color.Transparent; // changue this color for design the grid layout
 
             var grid = new Grid()
             {
                 VerticalOptions = LayoutOptions.CenterAndExpand,
                 RowSpacing = 20,
                 ColumnSpacing = 20,
-                Padding = new Thickness(20, 20 , 20, 20),
+                Padding = new Thickness(20, 20, 20, 20),
                 BackgroundColor = gridBackGroundColor,
             };
 
@@ -50,17 +59,15 @@ namespace OpenGloveApp.Pages
                 BackgroundColor = itemBackGroundColor,
             };
 
-            //for subscribe OnMenuClicked to ImageCircleTouchables
             grid.Children.Add(board, 0, 0);
             grid.Children.Add(actuators, 1, 0);
             grid.Children.Add(flexors, 2, 0);
             grid.Children.Add(IMU, 0, 1);
 
             Menu.Children.Add(grid);
-
         }
 
-        // Method to subscribe to CircleImageTouchable ItemClicked
+        // Method to subscribe to OpenGloveApp.Extensions.ImageCircleTouchable for ItemClicked
         public void OnMenuItemClicked(object source, EventArgs e)
         {
             var menuItemText = ((ImageCircleTouchable)source).Text;
@@ -98,6 +105,12 @@ namespace OpenGloveApp.Pages
                 default:
                     break;
             }
+        }
+
+        public async void CreateNewConfiguration(object sender, System.EventArgs e)
+        {
+            await Animations.AnimationTouch((View)sender);
+            await DisplayAlert("New configuration", "hi", "OK");
         }
     }
 }

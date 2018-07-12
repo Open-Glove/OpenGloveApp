@@ -39,5 +39,6 @@ namespace OpenGloveApp
         {
             // Handle when your app resumes
         }
+
     }
 }

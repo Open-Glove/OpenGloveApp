@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="OpenGloveApp.Pages.ServerPage">
+<ContentPage 
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="OpenGloveApp.Pages.ServerPage">
    <ContentPage.Content>
         <StackLayout Orientation="Vertical">
             <Label x:Name="page_description" 
@@ -7,7 +10,33 @@
                    FontSize="Medium"
                    TextColor="{DynamicResource color_text}"
                    Text="Configuration of WebSocket server"/>
+
+            <StackLayout Orientation="Horizontal">
+                <Label Text="End Point"
+                       VerticalOptions="Center"
+                       FontSize="Medium"
+                       TextColor="{DynamicResource color_text}"/>
+                <Entry x:Name="entryEndPointServer"
+                       Text="ws://127.0.0.1:7070"
+                       FontSize="Medium"
+                       TextColor="{DynamicResource color_text}"/>
+            </StackLayout>
             
+            <StackLayout Orientation="Horizontal">
+                <Label Text="Server status:" 
+                       FontSize="Medium"
+                       TextColor="{DynamicResource color_text}"/> 
+                <Label x:Name="labelServerStatus"
+                       Text="OFF"
+                       FontSize="Medium"
+                       TextColor="{DynamicResource color_accent}"/>
+                
+                <Switch x:Name="switchServer"
+                        HorizontalOptions="EndAndExpand"
+                        VerticalOptions="Center"
+                        Toggled="Switcher_Toogled"/>
+            </StackLayout>
+
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

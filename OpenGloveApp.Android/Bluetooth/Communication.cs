@@ -50,15 +50,24 @@ namespace OpenGloveApp.Droid
 
         public void OpenDeviceConnection(ContentPage contentPage, BluetoothDevices bluetoothDevice)
         {
-            mDevice = mBoundedDevices[bluetoothDevice.Name] as BluetoothDevice;
-            ConnectThread connectThread = new ConnectThread(contentPage, mDevice);
-            connectThread.Start();
+            if (mBluetoothAdapter != null)
+            {
+                if (mBluetoothAdapter.IsEnabled)
+                {
+                    mDevice = mBoundedDevices[bluetoothDevice.Name] as BluetoothDevice;
+                    ConnectThread connectThread = new ConnectThread(contentPage, mDevice);
+                    connectThread.Start();
+                }
+            }
         }
 
         public List<BluetoothDevices> GetAllPairedDevices()
         {
+            if (mBluetoothAdapter == null) return null;
+
             mBoundedDevices.Clear();
             mBoundedDevicesModel.Clear();
+
 
             var devices = mBluetoothAdapter.BondedDevices;
 

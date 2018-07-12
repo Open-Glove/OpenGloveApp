@@ -1,7 +1,5 @@
-﻿using System;
-using System.Diagnostics;
-using BottomBar.XamarinForms;
-using OpenGloveApp.Extensions;
+﻿using BottomBar.XamarinForms;
+using OpenGloveApp.OpenGloveAPI;
 using Xamarin.Forms;
 using static OpenGloveApp.AppConstants.AppConstants;
 
@@ -10,6 +8,8 @@ namespace OpenGloveApp.Pages
    
     public partial class Home : BottomBarPage
     {
+        public static OpenGlove OpenGlove = new OpenGlove();
+
         public Home()
         {
             InitializeComponent();
@@ -22,9 +22,6 @@ namespace OpenGloveApp.Pages
                 default:
                     break;
             }
-
-
-
         }
 
         protected override void OnCurrentPageChanged()

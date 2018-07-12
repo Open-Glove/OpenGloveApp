@@ -11,11 +11,24 @@
                    FontSize="Medium"
                    TextColor="{DynamicResource color_text}"
                    Text="Load or create Configurations"/>
-            <Label 
-                   HorizontalOptions="Start"
-                   FontSize="Medium"
-                   TextColor="{DynamicResource primary_colour}"
-                   Text="Current Configuration"/>
+            <StackLayout Orientation="Horizontal">
+                <Label HorizontalOptions="Start"
+                       FontSize="Medium"
+                       TextColor="{DynamicResource primary_colour}"
+                       Text="Current Configuration"/>
+                
+                <Button x:Name="buttonAddConfiguration"
+                        HeightRequest="20"
+                        WidthRequest="20"
+                        HorizontalOptions="EndAndExpand"
+                        BorderColor="Transparent"
+                        BackgroundColor="Transparent"
+                        Image="ic_add_circle"
+                        Clicked="CreateNewConfiguration"/>
+            </StackLayout>
+
+            <Picker x:Name="pickerCurrentConfiguration"
+                    Title="Select the current configuration"/>
             
         </StackLayout>
     </ContentPage.Content>
