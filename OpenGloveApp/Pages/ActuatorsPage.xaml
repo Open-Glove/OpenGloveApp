@@ -2,9 +2,12 @@
 <ContentPage 
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    x:Class="OpenGloveApp.Pages.ActuatorsPage"
-    Title="Actuators">
+    x:Class="OpenGloveApp.Pages.ActuatorsPage">
     <ContentPage.Content>
-        <Label Text="Actuators configuration" VerticalOptions="Center" HorizontalOptions="Center"/>
+        <Label x:Name="page_description" 
+               HorizontalOptions="Center"
+               FontSize="Medium"
+               TextColor="{DynamicResource color_text}"
+               Text="Actuators Mapping"/>
     </ContentPage.Content>
 </ContentPage>

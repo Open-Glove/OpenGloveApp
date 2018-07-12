@@ -13,6 +13,8 @@
             HorizontalOptions="Center"
             VerticalOptions="Center"
             />
-        <Label Text="{Binding Text}" HorizontalOptions="Center"/>
+        <Label Text="{Binding Text}" 
+               HorizontalOptions="Center"
+               TextColor="{DynamicResource color_text}"/>
     </StackLayout>
 </ContentView>

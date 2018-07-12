@@ -6,10 +6,10 @@
     xmlns:xf="clr-namespace:BottomBar.XamarinForms"
     xmlns:local="clr-namespace:OpenGloveApp.Pages">
     
-    <local:ConfigurationPage Title="Configuration" Padding="0,20,0,0" Icon="ic_settings"/>
+    <local:ConfigurationPage Title="Configuration" Padding="10,10,10,0" Icon="ic_settings"/>
 
-    <local:DevicesPage Title="Devices" Padding="0,20,0,0" Icon="ic_bluetooth"/>
+    <local:DevicesPage Title="Devices" Padding="10,10,10,0" Icon="ic_bluetooth"/>
 
-    <local:ServerPage Title="Server" Padding="0,20,0,0" Icon="ic_dvr" />
+    <local:ServerPage Title="Server" Padding="10,10,10,0" Icon="ic_dvr" />
 
 </xf:BottomBarPage>

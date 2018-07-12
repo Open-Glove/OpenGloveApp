@@ -3,9 +3,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="OpenGloveApp.Pages.ConfigurationPage"
              xmlns:local="clr-namespace:OpenGloveApp.Extensions"
-             Title="Configuration">
+             Title="Configurations">
     <ContentPage.Content>
         <StackLayout x:Name="Menu" Orientation="Vertical">
+            <Label x:Name="page_description" 
+                   HorizontalOptions="Center"
+                   FontSize="Medium"
+                   TextColor="{DynamicResource color_text}"
+                   Text="Load or create Configurations"/>
+            <Label 
+                   HorizontalOptions="Start"
+                   FontSize="Medium"
+                   TextColor="{DynamicResource primary_colour}"
+                   Text="Current Configuration"/>
             
         </StackLayout>
     </ContentPage.Content>

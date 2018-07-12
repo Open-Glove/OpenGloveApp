@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using OpenGloveApp.Extensions;
 using Xamarin.Forms;
 
@@ -70,16 +68,32 @@ namespace OpenGloveApp.Pages
             switch (menuItemText)
             {
                 case "Boards":
-                    Navigation.PushAsync(new DevicesPage());
+                    Navigation.PushAsync(new BoardsPage()
+                    { 
+                        Padding = AppConstants.AppConstants.ChildrenPagePadding,
+                        Title = (Xamarin.Forms.Device.RuntimePlatform == Xamarin.Forms.Device.iOS) ?  "Boards": "Boards Configuration",
+                    });
                     break;
                 case "Actuators":
-                    Navigation.PushAsync(new ActuatorsPage());
+                    Navigation.PushAsync(new ActuatorsPage()
+                    {
+                        Padding = AppConstants.AppConstants.ChildrenPagePadding,
+                        Title = (Xamarin.Forms.Device.RuntimePlatform == Xamarin.Forms.Device.iOS) ? "Actuators" : "Actuators Configuration",
+                    });
                     break;
                 case "Flexors":
-                    Navigation.PushAsync(new FlexorsPage());
+                    Navigation.PushAsync(new FlexorsPage()
+                    {
+                        Padding = AppConstants.AppConstants.ChildrenPagePadding,
+                        Title = (Xamarin.Forms.Device.RuntimePlatform == Xamarin.Forms.Device.iOS) ? "Flexors" : "Flexors Configuration",
+                    });
                     break;
                 case "IMU":
-                    Navigation.PushAsync(new IMUPage());
+                    Navigation.PushAsync(new IMUPage()
+                    { 
+                        Padding = AppConstants.AppConstants.ChildrenPagePadding,
+                        Title = (Xamarin.Forms.Device.RuntimePlatform == Xamarin.Forms.Device.iOS) ? "IMU" : "IMU Configuration",
+                    });
                     break;
                 default:
                     break;

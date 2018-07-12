@@ -14,8 +14,13 @@ namespace OpenGloveApp
             NavigationPage navigationPage = new NavigationPage(new Home())
             {
                 BarTextColor = Color.White,
-                BarBackgroundColor = Color.FromHex(AppConstants.Colors.ColorPrimary)
+                BarBackgroundColor = Color.FromHex(AppConstants.Colors.ColorPrimary),
             };
+
+            Current.Resources["primary_colour"] = AppConstants.Colors.ColorPrimary;
+            Current.Resources["primary_dark"] = AppConstants.Colors.ColorPrimaryDark;
+            Current.Resources["color_accent"] = AppConstants.Colors.ColorAccent;
+            Current.Resources["color_text"] = AppConstants.Colors.ColorText;
 
             MainPage = navigationPage;
         }

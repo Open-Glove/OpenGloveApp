@@ -5,9 +5,12 @@
     x:Class="OpenGloveApp.Pages.DevicesPage"
     Title="Devices">
     <ContentPage.Content>
-        <StackLayout Orientation="Vertical">
-
-            <Label Text="Devices configuration" VerticalOptions="Center" HorizontalOptions="Center"/>
+         <StackLayout Orientation="Vertical">
+            <Label x:Name="page_description" 
+                   HorizontalOptions="Center"
+                   FontSize="Medium"
+                   TextColor="{DynamicResource color_text}"
+                   Text="Select the paired Devices to use"/>
             
         </StackLayout>
     </ContentPage.Content>
