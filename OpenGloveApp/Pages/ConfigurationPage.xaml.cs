@@ -67,6 +67,11 @@ namespace OpenGloveApp.Pages
             Menu.Children.Add(grid);
         }
 
+        void Handle_Activated(object sender, System.EventArgs e)
+        {
+            DisplayAlert("Settings Activated", "Your preseed: " + ((ToolbarItem)sender).Text, "OK");
+        }
+
         // Method to subscribe to OpenGloveApp.Extensions.ImageCircleTouchable for ItemClicked
         public void OnMenuItemClicked(object source, EventArgs e)
         {

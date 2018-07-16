@@ -5,7 +5,7 @@
     x:Class="OpenGloveApp.Pages.Home"
     xmlns:xf="clr-namespace:BottomBar.XamarinForms"
     xmlns:local="clr-namespace:OpenGloveApp.Pages">
-    
+     
     <local:ConfigurationPage Title="Configuration" Padding="10,10,10,0" Icon="ic_settings"/>
 
     <local:DevicesPage Title="Devices" Padding="10,10,10,0" Icon="ic_bluetooth"/>
