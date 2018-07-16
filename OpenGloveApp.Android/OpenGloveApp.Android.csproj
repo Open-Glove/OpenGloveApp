@@ -8,7 +8,7 @@
     <TemplateGuid>{c9e5eea5-ca05-42a1-839b-61506e0a37df}</TemplateGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>OpenGloveApp.Droid</RootNamespace>
-    <AssemblyName>OpenGloveApp.Android</AssemblyName>
+    <AssemblyName>OpenGlove.Android</AssemblyName>
     <AndroidApplication>True</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
     <AndroidResgenClass>Resource</AndroidResgenClass>
@@ -60,6 +60,9 @@
     <PackageReference Include="PCLStorage">
       <Version>1.0.2</Version>
     </PackageReference>
+    <PackageReference Include="Xam.Plugins.Forms.ImageCircle">
+      <Version>3.0.0.5</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainActivity.cs" />
@@ -97,7 +100,77 @@
     <AndroidResource Include="Resources\mipmap-xhdpi\ic_launcher.png" />
     <AndroidResource Include="Resources\mipmap-xxhdpi\ic_launcher.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_launcher.png" />
-    <AndroidResource Include="Resources\drawable\web_hi_res_512.png" />
+    <AndroidResource Include="Resources\drawable\logo_splash_screen.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\IMU_sensor.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\actuator_mapping_back.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\actuator_mapping_front.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\flexor_mapping.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\ic_add_circle.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\ic_back_arrow.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\ic_bluetooth.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\ic_bluetooth_green.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\ic_dvr.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\ic_dvr_green.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\ic_more_vert_white.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\ic_settings.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\ic_settings_green.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\IMU_sensor.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\actuator_mapping_back.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\actuator_mapping_front.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\flexor_mapping.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\ic_add_circle.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\ic_back_arrow.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\ic_bluetooth.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\ic_bluetooth_green.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\ic_dvr.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\ic_dvr_green.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\ic_more_vert_white.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\ic_settings.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\ic_settings_green.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\IMU_sensor.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\actuator_mapping_back.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\actuator_mapping_front.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\flexor_mapping.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\ic_add_circle.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\ic_back_arrow.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\ic_bluetooth.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\ic_bluetooth_green.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\ic_dvr.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\ic_dvr_green.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\ic_more_vert_white.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\ic_settings.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\ic_settings_green.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\IMU_sensor.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\actuator_mapping_back.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\actuator_mapping_front.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\flexor_mapping.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\ic_add_circle.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\ic_back_arrow.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\ic_bluetooth.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\ic_bluetooth_green.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\ic_dvr.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\ic_dvr_green.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\ic_more_vert_white.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\ic_settings.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\ic_settings_green.png" />
+    <AndroidResource Include="Resources\drawable\IMU_sensor.png" />
+    <AndroidResource Include="Resources\drawable\actuator_mapping_back.png" />
+    <AndroidResource Include="Resources\drawable\actuator_mapping_front.png" />
+    <AndroidResource Include="Resources\drawable\flexor_mapping.png" />
+    <AndroidResource Include="Resources\drawable\ic_add_circle.png" />
+    <AndroidResource Include="Resources\drawable\ic_back_arrow.png" />
+    <AndroidResource Include="Resources\drawable\ic_bluetooth.png" />
+    <AndroidResource Include="Resources\drawable\ic_bluetooth_green.png" />
+    <AndroidResource Include="Resources\drawable\ic_dvr.png" />
+    <AndroidResource Include="Resources\drawable\ic_dvr_green.png" />
+    <AndroidResource Include="Resources\drawable\ic_more_vert_white.png" />
+    <AndroidResource Include="Resources\drawable\ic_settings.png" />
+    <AndroidResource Include="Resources\drawable\ic_settings_green.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\board.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\board.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\board.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\board.png" />
+    <AndroidResource Include="Resources\drawable\board.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

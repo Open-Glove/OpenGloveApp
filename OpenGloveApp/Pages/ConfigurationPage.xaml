@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="OpenGloveApp.Pages.ConfigurationPage"
+             xmlns:local="clr-namespace:OpenGloveApp.Extensions"
+             Title="Configurations">
+    <!-- Only work fine in Android style use code for generate to specific UI iOS-Android -->
+    <!-- https://github.com/tkowalczyk/SimpleToolbarsForms/blob/master/SimpleToolbarsForms/SimpleToolbarsForms/SimpleToolbarsForms/Views/BaseView.cs -->
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Icon="ic_more_vert_white" Text="Save" Order="Secondary" Priority="0" Activated="Handle_Activated"/>
+        <ToolbarItem Icon="ic_settings_green" Text="Load" Order="Secondary" Priority="2" Activated="Handle_Activated"/>
+        <ToolbarItem Icon="ic_add_circle" Text="Help" Order="Secondary" Priority="3" Activated="Handle_Activated"/>
+    </ContentPage.ToolbarItems>
+    
+    <ContentPage.Content>
+        <StackLayout x:Name="Menu" Orientation="Vertical">
+            <Label x:Name="page_description" 
+                   HorizontalOptions="Center"
+                   FontSize="Medium"
+                   TextColor="{DynamicResource color_text}"
+                   Text="Load or create Configurations"/>
+            <StackLayout Orientation="Horizontal">
+                <Label HorizontalOptions="Start"
+                       FontSize="Medium"
+                       TextColor="{DynamicResource primary_colour}"
+                       Text="Current Configuration"/>
+                
+                <Button x:Name="buttonAddConfiguration"
+                        HeightRequest="20"
+                        WidthRequest="20"
+                        HorizontalOptions="EndAndExpand"
+                        BorderColor="Transparent"
+                        BackgroundColor="Transparent"
+                        Image="ic_add_circle"
+                        Clicked="CreateNewConfiguration"/>
+            </StackLayout>
+
+            <Picker x:Name="pickerCurrentConfiguration"
+                    Title="Select the current configuration"/>
+            
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

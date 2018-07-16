@@ -1,4 +1,5 @@
 using System;
+using OpenGloveApp.Pages;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -10,8 +11,18 @@ namespace OpenGloveApp
         public App()
         {
             InitializeComponent();
+            NavigationPage navigationPage = new NavigationPage(new Home())
+            {
+                BarTextColor = Color.White,
+                BarBackgroundColor = Color.FromHex(AppConstants.Colors.ColorPrimary),
+            };
 
-            MainPage = new OpenGloveAppPage();
+            Current.Resources["primary_colour"] = AppConstants.Colors.ColorPrimary;
+            Current.Resources["primary_dark"] = AppConstants.Colors.ColorPrimaryDark;
+            Current.Resources["color_accent"] = AppConstants.Colors.ColorAccent;
+            Current.Resources["color_text"] = AppConstants.Colors.ColorText;
+
+            MainPage = navigationPage;
         }
 
         protected override void OnStart()
@@ -28,5 +39,6 @@ namespace OpenGloveApp
         {
             // Handle when your app resumes
         }
+
     }
 }

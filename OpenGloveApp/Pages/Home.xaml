@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="OpenGloveApp.Pages.Home">
-    <ContentPage.Content>
-        <Label 
-            Text="Home"
-            VerticalOptions="Center"/>
-    </ContentPage.Content>
-</ContentPage>
+<xf:BottomBarPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="OpenGloveApp.Pages.Home"
+    xmlns:xf="clr-namespace:BottomBar.XamarinForms"
+    xmlns:local="clr-namespace:OpenGloveApp.Pages">
+     
+    <local:ConfigurationPage Title="Configuration" Padding="10,10,10,0" Icon="ic_settings"/>
+
+    <local:DevicesPage Title="Devices" Padding="10,10,10,0" Icon="ic_bluetooth"/>
+
+    <local:ServerPage Title="Server" Padding="10,10,10,0" Icon="ic_dvr" />
+
+</xf:BottomBarPage>

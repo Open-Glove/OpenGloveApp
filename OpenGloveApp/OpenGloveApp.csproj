@@ -8,9 +8,16 @@
     <PackageReference Include="Xamarin.Forms" Version="3.0.0.482510" />
     <PackageReference Include="PCLStorage" Version="1.0.2" />
     <PackageReference Include="Fleck" Version="1.0.3" />
+    <PackageReference Include="ThriveGmbH.BottomNavigationBar.XF" Version="1.0.2" />
+    <PackageReference Include="Xam.Plugins.Forms.ImageCircle" Version="3.0.0.5" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebSocketServer\" />
     <Folder Include="Pages\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Pages\CustomListItem\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Pages\DevicePage.xaml.cs" />
   </ItemGroup>
 </Project>
