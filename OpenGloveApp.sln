@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenGloveApp.iOS", "OpenGlo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenGloveApp", "OpenGloveApp\OpenGloveApp.csproj", "{0B598B7D-B52A-4C36-AB8C-0DA88DA13563}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenGlove_API_C_Sharp_HL", "OpenGlove_API_C_Sharp_HL\OpenGlove_API_C_Sharp_HL.csproj", "{800E8B82-4CA2-41BC-8260-43FE22E5D5DD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,5 +69,21 @@ Global
 		{0B598B7D-B52A-4C36-AB8C-0DA88DA13563}.Ad-Hoc|iPhone.Build.0 = Debug|Any CPU
 		{0B598B7D-B52A-4C36-AB8C-0DA88DA13563}.AppStore|iPhone.ActiveCfg = Debug|Any CPU
 		{0B598B7D-B52A-4C36-AB8C-0DA88DA13563}.AppStore|iPhone.Build.0 = Debug|Any CPU
+		{800E8B82-4CA2-41BC-8260-43FE22E5D5DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{800E8B82-4CA2-41BC-8260-43FE22E5D5DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{800E8B82-4CA2-41BC-8260-43FE22E5D5DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{800E8B82-4CA2-41BC-8260-43FE22E5D5DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{800E8B82-4CA2-41BC-8260-43FE22E5D5DD}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{800E8B82-4CA2-41BC-8260-43FE22E5D5DD}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{800E8B82-4CA2-41BC-8260-43FE22E5D5DD}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{800E8B82-4CA2-41BC-8260-43FE22E5D5DD}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{800E8B82-4CA2-41BC-8260-43FE22E5D5DD}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{800E8B82-4CA2-41BC-8260-43FE22E5D5DD}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{800E8B82-4CA2-41BC-8260-43FE22E5D5DD}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{800E8B82-4CA2-41BC-8260-43FE22E5D5DD}.Release|iPhone.Build.0 = Release|Any CPU
+		{800E8B82-4CA2-41BC-8260-43FE22E5D5DD}.Ad-Hoc|iPhone.ActiveCfg = Debug|Any CPU
+		{800E8B82-4CA2-41BC-8260-43FE22E5D5DD}.Ad-Hoc|iPhone.Build.0 = Debug|Any CPU
+		{800E8B82-4CA2-41BC-8260-43FE22E5D5DD}.AppStore|iPhone.ActiveCfg = Debug|Any CPU
+		{800E8B82-4CA2-41BC-8260-43FE22E5D5DD}.AppStore|iPhone.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

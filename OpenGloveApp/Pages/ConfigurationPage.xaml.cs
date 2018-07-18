@@ -15,6 +15,7 @@ namespace OpenGloveApp.Pages
             pickerCurrentConfiguration.ItemsSource = OpenGloveConfigurations;
 
             BuildGridMenuItems();
+            ConfigureToolbarItemsByPlatform();
         }
 
         public void BuildGridMenuItems()
@@ -67,9 +68,30 @@ namespace OpenGloveApp.Pages
             Menu.Children.Add(grid);
         }
 
+        public void ConfigureToolbarItemsByPlatform()
+        {
+            switch(Device.RuntimePlatform)
+            {
+                case Device.Android:
+                    ToolbarItemSave.Order = ToolbarItemOrder.Primary;
+                    ToolbarItemSave.Priority = 0;
+                    ToolbarItemHelp.Order = ToolbarItemOrder.Primary;
+                    ToolbarItemHelp.Priority = 1;
+                    break;
+                case Device.iOS:
+                    ToolbarItemSave.Order = ToolbarItemOrder.Primary;
+                    ToolbarItemSave.Priority = 0;
+                    ToolbarItemHelp.Order = ToolbarItemOrder.Primary;
+                    ToolbarItemHelp.Priority = 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+
         void Handle_Activated(object sender, System.EventArgs e)
         {
-            DisplayAlert("Settings Activated", "Your preseed: " + ((ToolbarItem)sender).Text, "OK");
+            DisplayAlert("Settings Activated", "Your pressed: " + ((ToolbarItem)sender).Text, "OK");
         }
 
         // Method to subscribe to OpenGloveApp.Extensions.ImageCircleTouchable for ItemClicked

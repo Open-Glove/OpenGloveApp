@@ -17,7 +17,12 @@ namespace OpenGloveApp.OpenGloveAPI
         /// <returns>An list with the paired BluetoothDevices</returns>
         List<BluetoothDevices> GetAllPairedDevices();
         /// <summary>
-        /// Open a Connection with 
+        /// Open a Connection with the Bluetooth Device
+        /// </summary>
+        /// <param name="bluetoothDevice"> The device to connect </param>
+        void OpenDeviceConnection(BluetoothDevices bluetoothDevice);
+        /// <summary>
+        /// Open a Connection with the Bluetooth Device
         /// </summary>
         /// <param name="contentPage"> The Page of xamarin.forms, the thread UI subscribe to Connected Thread</param>
         /// <param name="bluetoothDevice"> The device to connect </param>

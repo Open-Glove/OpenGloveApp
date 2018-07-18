@@ -12,8 +12,8 @@ namespace OpenGloveApp.Server
         private string mUrl;
         private WebSocketServer mServer; // sample "ws://127.0.0.1:7070"
         private List<IWebSocketConnection> allSockets = new List<IWebSocketConnection>();
+        private static Dictionary<string, IWebSocketConnection> WebSocketByDeviceName = new Dictionary<string, IWebSocketConnection>();
 
- 
         public OpenGloveServer(string url)
         {
             this.mUrl = url;
@@ -49,15 +49,35 @@ namespace OpenGloveApp.Server
         public void HandleMessage(IWebSocketConnection socket, string message)
         {
             Debug.WriteLine(message);
+            string[] words;
 
-            switch(message){
-                case "hello":
-                        socket.Send("world!");
-                        break;
-                default:
-                    socket.Send(message);
-                    break;
+            if(message != null)
+            {
+                try
+                {
+                    words = message.Split(',');
+                    switch (words[0])
+                    {
+                        case "ReadDataFrom":
+                            WebSocketByDeviceName.Add(words[1], socket);
+                            break;
+                        case "StopReadDataFrom":
+                            WebSocketByDeviceName.Remove(words[1]);
+                            break;
+                        case "hello":
+                            socket.Send("world!");
+                            break;
+                        default:
+                            socket.Send(message);
+                            break;
+                    }
+                }
+                catch
+                {
+                    Debug.WriteLine("ERROR: BAD FORMAT");
+                }
             }
+
         }
 
         public void CloseAllSockets()
@@ -75,8 +95,25 @@ namespace OpenGloveApp.Server
         public void Stop()
         {
             CloseAllSockets();
-            mServer.Dispose(); //this method does not allow more incoming connections, so it is necessary to disconnect all sockets first to cut off all communication
+            mServer.Dispose(); //this method does not allow more incoming connections, and disconnect the server. So it is necessary to disconnect all sockets first to cut off all communication
             allSockets.Clear();
+        }
+
+
+        //Event Handler subcribe to Data from OpenGloves Devices
+        public static void OnBluetoothMessage(object source, BluetoothEventArgs e)
+        {
+            SendDataIfWebSocketRequestedDataFromDevice(e);
+        }
+
+        public static void SendDataIfWebSocketRequestedDataFromDevice(BluetoothEventArgs e){
+            if (e.Message != null)
+            {
+                Debug.WriteLine($" [{e.DeviceName}] OpenGloveServer.OnBluetoothMessage: {e.Message}");
+
+                if (WebSocketByDeviceName.ContainsKey(e.DeviceName))
+                    WebSocketByDeviceName[e.DeviceName].Send(e.Message);
+            }
         }
     }
 }

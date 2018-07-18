@@ -39,7 +39,7 @@ namespace OpenGloveApp.Pages
             //Blocking call
             if (connect)
             {
-                Home.OpenGlove.OpenDeviceConnection(this, device); //Blocking call
+                Home.OpenGlove.OpenDeviceConnection(device); //Blocking call
             }
         }
 

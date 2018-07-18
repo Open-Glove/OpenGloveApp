@@ -5,13 +5,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using Android.Bluetooth;
-using OpenGloveApp.Droid;
+using OpenGloveApp.Droid.Bluetooth;
 using OpenGloveApp.Models;
 using OpenGloveApp.OpenGloveAPI;
 using Xamarin.Forms;
 
 [assembly: Xamarin.Forms.Dependency(typeof(Communication))]
-namespace OpenGloveApp.Droid
+namespace OpenGloveApp.Droid.Bluetooth
 {
     public class Communication : ICommunication
     {
@@ -46,6 +46,19 @@ namespace OpenGloveApp.Droid
                 throw e;
             }
             aConnectedObject = null;
+        }
+
+        public void OpenDeviceConnection(BluetoothDevices bluetoothDevice)
+        {
+            if (mBluetoothAdapter != null)
+            {
+                if (mBluetoothAdapter.IsEnabled)
+                {
+                    mDevice = mBoundedDevices[bluetoothDevice.Name] as BluetoothDevice;
+                    ConnectThread connectThread = new ConnectThread(mDevice);
+                    connectThread.Start();
+                }
+            }
         }
 
         public void OpenDeviceConnection(ContentPage contentPage, BluetoothDevices bluetoothDevice)
@@ -118,6 +131,26 @@ namespace OpenGloveApp.Droid
             private BluetoothAdapter mmBluetoothAdapter;
             private ContentPage mmContentPage;
 
+            public ConnectThread(BluetoothDevice device)
+            {
+                BluetoothSocket auxSocket = null;
+                mmDevice = device;
+
+                try
+                {
+                    Java.Util.UUID uuid = Java.Util.UUID.FromString(mUUID);
+                    auxSocket = (BluetoothSocket)mmDevice.Class.GetMethod("createRfcommSocket", new Java.Lang.Class[] { Java.Lang.Integer.Type }).Invoke(mmDevice, 1);
+                    Debug.WriteLine("BluetoothSocket: CREATED");
+                    Debug.WriteLine($"Name: {device.Name}, Address: {device.Address}");
+                }
+                catch (Java.IO.IOException e)
+                {
+                    Debug.WriteLine("BluetoothSocket: NOT CREATED");
+                    e.PrintStackTrace();
+                }
+                mmSocket = auxSocket;
+            }
+
             public ConnectThread(ContentPage contentPage, BluetoothDevice device)
             {
                 BluetoothSocket auxSocket = null;
@@ -154,7 +187,10 @@ namespace OpenGloveApp.Droid
                     Debug.WriteLine("BluetoothSocket: CONNECTED");
                     // Do work to manage the connection (in a separate thread)
                     // TODO manageConnectedSocket(mmSocket);
-                    mBluetoothManagement = new ConnectedThread(mmContentPage, mmSocket);
+                    if (mmContentPage != null)
+                        mBluetoothManagement = new ConnectedThread(mmContentPage, mmSocket);
+                    else
+                        mBluetoothManagement = new ConnectedThread(mmDevice, mmSocket);
                     mBluetoothManagement.Start();
                 }
                 catch (Java.IO.IOException e)
@@ -172,12 +208,34 @@ namespace OpenGloveApp.Droid
             // Event for send data to UI thread on Main Xamarin.Forms project
             public event EventHandler<BluetoothEventArgs> BluetoothDataReceived;
 
+            private string mmDeviceName;
+            private BluetoothDevice mmDevice;
             private BluetoothSocket mmSocket;
             private StreamReader mmInputStreamReader;
             private Stream mmOutputStream;
             private MessageGenerator mMessageGenerator = new MessageGenerator();
             private List<int> mFlexorPins = new List<int> { 17 }; //TODO get this from OpenGloveApp
             public int mEvaluation = 0; //OpenGloveAppPage.FLEXOR_EVALUATION; //OpenGloveAppPage.MOTOR_EVALUATION;
+
+            public ConnectedThread(BluetoothDevice device, BluetoothSocket bluetoothSocket)
+            {
+                mmDevice = device;
+                mmDeviceName = device.Name;
+                mmSocket = bluetoothSocket;
+                try
+                {
+                    mmInputStreamReader = new StreamReader(mmSocket.InputStream);
+                    mmOutputStream = mmSocket.OutputStream;
+                    this.BluetoothDataReceived += Server.OpenGloveServer.OnBluetoothMessage; // The WebSocket Server subscribe to this instance of ConnectedThread (Bluetooth Device)
+
+                }
+                catch (System.IO.IOException e)
+                {
+                    mmInputStreamReader.Close();
+                    mmOutputStream.Close();
+                    Debug.WriteLine(e.Message);
+                }
+            }
 
             public ConnectedThread(ContentPage contentPage, BluetoothSocket bluetoothSocket)
             {
@@ -189,6 +247,7 @@ namespace OpenGloveApp.Droid
 
                     //subscribe UI thread on this especific ConnectedThread for get data
                     this.BluetoothDataReceived += ((OpenGloveAppPage)contentPage).OnBluetoothMessage; //UI thread subscribe to this instance of ConnectedThread
+                    this.BluetoothDataReceived += Server.OpenGloveServer.OnBluetoothMessage; // The WebSocket Server subscribe to this instance of ConnectedThread (Bluetooth Device)
                     ((OpenGloveAppPage)contentPage).BluetoothMessageSended += this.OnBluetoothMessageSended; //This thread subscribe to UI thread for get commands
 
                 }
@@ -201,11 +260,11 @@ namespace OpenGloveApp.Droid
             }
 
             // Method for raise the event: UI, WebSocket Server
-            protected virtual void OnBluetootDataReceived(long threadId, string message)
+            protected virtual void OnBluetootDataReceived(long threadId, string deviceName, string message)
             {
                 if (BluetoothDataReceived != null)
                     BluetoothDataReceived(this, new BluetoothEventArgs()
-                    { ThreadId = threadId, Message = message });
+                { ThreadId = threadId, DeviceName = deviceName, Message = message});
             }
 
             //Handle event from UI thread
@@ -267,20 +326,14 @@ namespace OpenGloveApp.Droid
                 switch (mEvaluation)
                 {
                     case OpenGloveAppPage.FLEXOR_EVALUATION:
-                        {
-                            FlexorTest(1000, 1, "latency-test", "flexor1XamarinNexus.csv");
-                            break;
-                        }
+                        FlexorTest(1000, 1, "latency-test", "flexor1XamarinNexus.csv");
+                        break;
                     case OpenGloveAppPage.MOTOR_EVALUATION:
-                        {
-                            MotorTest(1000, 5, "latency-test", "motor5XamarinNexus.csv");
-                            break;
-                        }
+                        MotorTest(1000, 5, "latency-test", "motor5XamarinNexus.csv");
+                        break;
                     default:
-                        {
-                            FlexorCapture();
-                            break;
-                        }
+                        FlexorCapture();
+                        break;
                 }
             }
 
@@ -302,7 +355,7 @@ namespace OpenGloveApp.Droid
                         {
                             //Raise the event to UI thread, that need stay subscriber to this publisher thread
                             //Send the current thread id and send Message
-                            OnBluetootDataReceived(this.Id, line);
+                            OnBluetootDataReceived(this.Id, this.mmDeviceName, line);
                         }
                         else
                         {
@@ -357,7 +410,7 @@ namespace OpenGloveApp.Droid
 
                             //Raise the event to UI thread, that need stay subscriber to this publisher thread
                             //Send the current thread id and send Message
-                            OnBluetootDataReceived(this.Id, line);
+                            OnBluetootDataReceived(this.Id, this.mmDeviceName, line);
                         }
                         else
                         {

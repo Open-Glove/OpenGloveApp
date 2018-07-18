@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public class BluetoothEventArgs : EventArgs
 {
     public long ThreadId { get; set; }
+    public string DeviceName { get; set; }
     public int What { get; set; }
     public string Message { get; set; }
 

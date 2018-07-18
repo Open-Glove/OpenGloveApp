@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using OpenGloveApp.Droid;
+using OpenGloveApp.iOS.Bluetooth;
 using OpenGloveApp.Models;
 using OpenGloveApp.OpenGloveAPI;
 using Xamarin.Forms;
 
 [assembly: Xamarin.Forms.Dependency(typeof(Communication))]
-namespace OpenGloveApp.Droid
+namespace OpenGloveApp.iOS.Bluetooth
 {
     public class Communication : ICommunication
     {
+        public Communication()
+        {
+        }
+
         public void ClosePort()
         {
             throw new NotImplementedException();
