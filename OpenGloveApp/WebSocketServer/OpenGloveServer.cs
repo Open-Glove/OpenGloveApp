@@ -2,32 +2,35 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using Fleck;
+using OpenGloveApp.CustomEventArgs;
+using OpenGloveApp.AppConstants;
 
 namespace OpenGloveApp.Server
 {
     public class OpenGloveServer
     {
-        private string mUrl;
-        private WebSocketServer mServer; // sample "ws://127.0.0.1:7070"
+        private string url;
+        private WebSocketServer server; // sample "ws://127.0.0.1:7070"
         private List<IWebSocketConnection> allSockets = new List<IWebSocketConnection>();
-        private static Dictionary<string, IWebSocketConnection> WebSocketByDeviceName = new Dictionary<string, IWebSocketConnection>();
+        private static Dictionary<string, IWebSocketConnection> webSocketByDeviceName = new Dictionary<string, IWebSocketConnection>();
+        public event EventHandler<WebSocketEventArgs> WebSocketDataReceived;
+
 
         public OpenGloveServer(string url)
         {
-            this.mUrl = url;
+            this.url = url;
         }
 
         public void ConfigureServer()
         {
-            mServer.RestartAfterListenError = true;
+            server.RestartAfterListenError = true;
         }
 
         public void StartWebsockerServer()
         {
             FleckLog.Level = LogLevel.Debug;
-            mServer.Start(socket =>
+            server.Start(socket =>
             {
                 socket.OnOpen = () =>
                 {
@@ -38,6 +41,7 @@ namespace OpenGloveApp.Server
                 { 
                     Debug.WriteLine("Close WebSocket!");
                     allSockets.Remove(socket);
+                    webSocketByDeviceName.ContainsValue(socket);
                 };
                 socket.OnMessage = message =>
                 {
@@ -46,6 +50,15 @@ namespace OpenGloveApp.Server
             });
         }
 
+
+        /* WebSocket format message:  Action;DeviceName;Intensity;Regions
+         * sample: Activate;OpenGloveIZQ;255;0,2,6,7,29
+         * Action:      one of this Actions : Activate, StartCaptureData, StopCaptureData,
+         * DeviceName:  Name of bluetooth device to send the command
+         * Intensity:   0 to 255
+         * Regions:     a list of regions to activate (int)
+        */
+        // Handle Message from WebSocket Client
         public void HandleMessage(IWebSocketConnection socket, string message)
         {
             Debug.WriteLine(message);
@@ -59,10 +72,13 @@ namespace OpenGloveApp.Server
                     switch (words[0])
                     {
                         case "ReadDataFrom":
-                            WebSocketByDeviceName.Add(words[1], socket);
+                            webSocketByDeviceName.Add(words[1], socket);
                             break;
                         case "StopReadDataFrom":
-                            WebSocketByDeviceName.Remove(words[1]);
+                            webSocketByDeviceName.Remove(words[1]);
+                            break;
+                        case "Activate":
+                            //OnWebSocketDataReceived(OpenGloveActions.ACTIVATE_MOTORS, words[1], );
                             break;
                         case "hello":
                             socket.Send("world!");
@@ -74,11 +90,38 @@ namespace OpenGloveApp.Server
                 }
                 catch
                 {
-                    Debug.WriteLine("ERROR: BAD FORMAT");
+                    Debug.WriteLine("ERROR: BAD FORMAT, HandleMessage from WebSocketClient");
                 }
             }
 
         }
+
+        // Event Handler subcribe to Data from OpenGloves Devices
+        public static void OnBluetoothMessage(object source, BluetoothEventArgs e)
+        {
+            SendDataIfWebSocketRequestedDataFromDevice(e);
+        }
+
+        public static void SendDataIfWebSocketRequestedDataFromDevice(BluetoothEventArgs e)
+        {
+            if (e.Message != null)
+            {
+                Debug.WriteLine($" [{e.DeviceName}] OpenGloveServer.OnBluetoothMessage: {e.Message}");
+
+                if (webSocketByDeviceName.ContainsKey(e.DeviceName))
+                    webSocketByDeviceName[e.DeviceName].Send(e.Message);
+            }
+        }
+
+        // Method for raise event: 
+
+        protected virtual void OnWebSocketDataReceived(int what, string deviceName, string message)
+        {
+            if (WebSocketDataReceived != null)
+                WebSocketDataReceived(this, new WebSocketEventArgs()
+                { What = what, DeviceName = deviceName, Message = message });
+        }
+
 
         public void CloseAllSockets()
         {
@@ -87,7 +130,7 @@ namespace OpenGloveApp.Server
 
         public void Start()
         {
-            this.mServer = new WebSocketServer(mUrl);
+            this.server = new WebSocketServer(url);
             ConfigureServer();
             StartWebsockerServer();
         }
@@ -95,25 +138,8 @@ namespace OpenGloveApp.Server
         public void Stop()
         {
             CloseAllSockets();
-            mServer.Dispose(); //this method does not allow more incoming connections, and disconnect the server. So it is necessary to disconnect all sockets first to cut off all communication
+            server.Dispose(); //this method does not allow more incoming connections, and disconnect the server. So it is necessary to disconnect all sockets first to cut off all communication
             allSockets.Clear();
-        }
-
-
-        //Event Handler subcribe to Data from OpenGloves Devices
-        public static void OnBluetoothMessage(object source, BluetoothEventArgs e)
-        {
-            SendDataIfWebSocketRequestedDataFromDevice(e);
-        }
-
-        public static void SendDataIfWebSocketRequestedDataFromDevice(BluetoothEventArgs e){
-            if (e.Message != null)
-            {
-                Debug.WriteLine($" [{e.DeviceName}] OpenGloveServer.OnBluetoothMessage: {e.Message}");
-
-                if (WebSocketByDeviceName.ContainsKey(e.DeviceName))
-                    WebSocketByDeviceName[e.DeviceName].Send(e.Message);
-            }
         }
     }
 }

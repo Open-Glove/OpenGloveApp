@@ -46,4 +46,10 @@ namespace OpenGloveApp.AppConstants
         public static readonly string ColorAccent = "#FF4081";
         public static readonly string ColorText = "#737474";
     }
+
+    public static class OpenGloveActions
+    {
+        public static readonly int ACTIVATE_MOTORS = 1;
+        public static readonly int DEACTIVATE_MOTORS = 2;
+    }
 }

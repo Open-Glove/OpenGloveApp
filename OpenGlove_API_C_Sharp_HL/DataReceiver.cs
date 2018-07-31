@@ -27,7 +27,7 @@ namespace OpenGlove_API_C_Sharp_HL
             }
             catch
             {
-                Console.WriteLine("Error");
+                Debug.WriteLine("Error try webSocket Read Data ");
             }
         }
 
@@ -128,7 +128,7 @@ namespace OpenGlove_API_C_Sharp_HL
                 }
                 catch
                 {
-                    Console.WriteLine("ERROR: BAD FORMAT");
+                    Debug.WriteLine("ERROR: BAD FORMAT Handle Message from WebSocket Server");
                 }
             }
         }

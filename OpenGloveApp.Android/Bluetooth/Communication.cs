@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using Android.Bluetooth;
+using OpenGloveApp.CustomEventArgs;
 using OpenGloveApp.Droid.Bluetooth;
 using OpenGloveApp.Models;
 using OpenGloveApp.OpenGloveAPI;
@@ -205,7 +206,7 @@ namespace OpenGloveApp.Droid.Bluetooth
 
         public class ConnectedThread : Java.Lang.Thread
         {
-            // Event for send data to UI thread on Main Xamarin.Forms project
+            // Event for send data from Bluetooth Socket to subcribers
             public event EventHandler<BluetoothEventArgs> BluetoothDataReceived;
 
             private string mmDeviceName;
@@ -259,12 +260,21 @@ namespace OpenGloveApp.Droid.Bluetooth
                 }
             }
 
-            // Method for raise the event: UI, WebSocket Server
-            protected virtual void OnBluetootDataReceived(long threadId, string deviceName, string message)
+            // Method for raise the event: Bluetooth Socket (handled by thread) to WebSocket Server
+            protected virtual void OnBluetoothDataReceived(long threadId, string deviceName, string message)
             {
                 if (BluetoothDataReceived != null)
                     BluetoothDataReceived(this, new BluetoothEventArgs()
                 { ThreadId = threadId, DeviceName = deviceName, Message = message});
+            }
+
+
+            // Method for capture
+
+            // Handle event from WebSocket Server data
+            public void OnWebSocketServerMessage(object source, WebSocketEventArgs e)
+            {
+                
             }
 
             //Handle event from UI thread
@@ -355,7 +365,7 @@ namespace OpenGloveApp.Droid.Bluetooth
                         {
                             //Raise the event to UI thread, that need stay subscriber to this publisher thread
                             //Send the current thread id and send Message
-                            OnBluetootDataReceived(this.Id, this.mmDeviceName, line);
+                            OnBluetoothDataReceived(this.Id, this.mmDeviceName, line);
                         }
                         else
                         {

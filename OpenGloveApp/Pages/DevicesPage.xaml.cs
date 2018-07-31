@@ -31,6 +31,11 @@ namespace OpenGloveApp.Pages
 
         }
 
+        void Handle_Activated(object sender, System.EventArgs e)
+        {
+            DisplayAlert("Settings Activated", "Your pressed: " + ((ToolbarItem)sender).Text, "OK");
+        }
+
         async void Handle_ItemTapped(object sender, Xamarin.Forms.ItemTappedEventArgs e)
         {
             var device = e.Item as BluetoothDevices;
