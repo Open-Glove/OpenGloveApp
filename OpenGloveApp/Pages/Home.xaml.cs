@@ -1,4 +1,5 @@
 ﻿using BottomBar.XamarinForms;
+using OpenGloveApp.Models;
 using OpenGloveApp.OpenGloveAPI;
 using Xamarin.Forms;
 using static OpenGloveApp.AppConstants.AppConstants;
@@ -9,6 +10,7 @@ namespace OpenGloveApp.Pages
     public partial class Home : BottomBarPage
     {
         public static OpenGlove OpenGlove = new OpenGlove();
+        public static OpenGloveConfiguration OpenGloveConfiguration = new OpenGloveConfiguration();
 
         public Home()
         {

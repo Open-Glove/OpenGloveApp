@@ -5,10 +5,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using Android.Bluetooth;
+using OpenGloveApp.AppConstants;
 using OpenGloveApp.CustomEventArgs;
 using OpenGloveApp.Droid.Bluetooth;
 using OpenGloveApp.Models;
 using OpenGloveApp.OpenGloveAPI;
+using OpenGloveApp.Pages;
 using Xamarin.Forms;
 
 [assembly: Xamarin.Forms.Dependency(typeof(Communication))]
@@ -228,6 +230,7 @@ namespace OpenGloveApp.Droid.Bluetooth
                     mmInputStreamReader = new StreamReader(mmSocket.InputStream);
                     mmOutputStream = mmSocket.OutputStream;
                     this.BluetoothDataReceived += Server.OpenGloveServer.OnBluetoothMessage; // The WebSocket Server subscribe to this instance of ConnectedThread (Bluetooth Device)
+                    Server.OpenGloveServer.WebSocketDataReceived += this.OnWebSocketServerMessage; // The Thread subscribe to WebSocket Server
 
                 }
                 catch (System.IO.IOException e)
@@ -248,7 +251,7 @@ namespace OpenGloveApp.Droid.Bluetooth
 
                     //subscribe UI thread on this especific ConnectedThread for get data
                     this.BluetoothDataReceived += ((OpenGloveAppPage)contentPage).OnBluetoothMessage; //UI thread subscribe to this instance of ConnectedThread
-                    this.BluetoothDataReceived += Server.OpenGloveServer.OnBluetoothMessage; // The WebSocket Server subscribe to this instance of ConnectedThread (Bluetooth Device)
+                    //this.BluetoothDataReceived += Server.OpenGloveServer.OnBluetoothMessage; // The WebSocket Server subscribe to this instance of ConnectedThread (Bluetooth Device)
                     ((OpenGloveAppPage)contentPage).BluetoothMessageSended += this.OnBluetoothMessageSended; //This thread subscribe to UI thread for get commands
 
                 }
@@ -268,18 +271,36 @@ namespace OpenGloveApp.Droid.Bluetooth
                 { ThreadId = threadId, DeviceName = deviceName, Message = message});
             }
 
-
-            // Method for capture
-
             // Handle event from WebSocket Server data
             public void OnWebSocketServerMessage(object source, WebSocketEventArgs e)
             {
-                
+                // Only accept message to Bluetooth Device managed for this ConnectedThread.
+                // Improve with specific listeners for each connected thread(openglove devices connected).
+                if(e.DeviceName == mmDeviceName)
+                {
+                    string message;
+                    switch (e.What)
+                    {
+                        case (int)OpenGloveActions.StartCaptureData:
+                            break;
+                        case (int)OpenGloveActions.StopCaptureData:
+                            break;
+                        case (int)OpenGloveActions.ActivateActuators:
+                            message = mMessageGenerator.ActivateMotor(e.Pins, e.Values);
+                            this.Write(message);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
             }
 
             //Handle event from UI thread
             public void OnBluetoothMessageSended(object source, BluetoothEventArgs e)
             {
+                int index = 3; //0
+                int count = 1; //2
                 switch (e.What)
                 {
                     case OpenGloveAppPage.INITIALIZE_MOTORS:
@@ -290,19 +311,19 @@ namespace OpenGloveApp.Droid.Bluetooth
                             break;
                         }
                     case OpenGloveAppPage.ACTIVATE_MOTORS:
-                        {
+                        {   
                             Debug.WriteLine($"ACTIVATE_MOTORS: Activating motors (thread: {this.Id})");
                             Debug.WriteLine($"ValuesON: {((List<string>)e.ValuesON).Count}");
-                            Debug.WriteLine($"ValuesON.range(0,2): { ((List<string>)e.ValuesON).GetRange(0, 2).ToArray() }");
-                            Debug.WriteLine($"Pins.range(0,2).Count: { ((List<int>)e.Pins).GetRange(0, 2).Count }");
-                            string message = mMessageGenerator.ActivateMotor(((List<int>)e.Pins).GetRange(0, 2).ToArray(), ((List<string>)e.ValuesON).GetRange(0, 2).ToArray());
+                            Debug.WriteLine($"ValuesON.range(0,2): { ((List<string>)e.ValuesON).GetRange(index, count).ToArray() }");
+                            Debug.WriteLine($"Pins.range(0,2).Count: { ((List<int>)e.Pins).GetRange(index, count).Count }");
+                            string message = mMessageGenerator.ActivateMotor(((List<int>)e.Pins).GetRange(index, count).ToArray(), ((List<string>)e.ValuesON).GetRange(index, count).ToArray());
                             this.Write(message);
                             break;
                         }
                     case OpenGloveAppPage.DISABLE_MOTORS:
                         {
                             Debug.WriteLine($"DISABLE_MOTORS: Disable motors (thread: {this.Id})");
-                            string message = mMessageGenerator.ActivateMotor(((List<int>)e.Pins).GetRange(0, 2).ToArray(), ((List<string>)e.ValuesOFF).GetRange(0, 2).ToArray());
+                            string message = mMessageGenerator.ActivateMotor(((List<int>)e.Pins).GetRange(index, count).ToArray(), ((List<string>)e.ValuesOFF).GetRange(index, count).ToArray());
                             this.Write(message);
                             break;
                         }
@@ -351,9 +372,12 @@ namespace OpenGloveApp.Droid.Bluetooth
             {
                 // Keep listening to the InputStream whit a StreamReader until an exception occurs
                 string line;
-                // TODO CHangue this for a Load Configuration on OpenGlove
-                // 1 a 10
-                this.Write(mMessageGenerator.addFlexor(mFlexorPins[0], 1));
+                // TODO Update this code when OG Configuration is dinamic Load Configuration on OpenGlove
+                this.Write(mMessageGenerator.InitializeMotor(Home.OpenGloveConfiguration.PositivePins));
+                this.Write(mMessageGenerator.InitializeMotor(Home.OpenGloveConfiguration.NegativePins));
+                int mapping = (int)FlexorsRegion.ThumbInterphalangealJoint;
+                this.Write(mMessageGenerator.addFlexor(Home.OpenGloveConfiguration.FlexorPins[mapping], mapping));
+
                 while (true)
                 {
                     try
@@ -363,14 +387,17 @@ namespace OpenGloveApp.Droid.Bluetooth
 
                         if (line != null)
                         {
-                            //Raise the event to UI thread, that need stay subscriber to this publisher thread
-                            //Send the current thread id and send Message
+                            //Raise the event to WebSocket Server, that need stay subscriber to this publisher thread
                             OnBluetoothDataReceived(this.Id, this.mmDeviceName, line);
                         }
                         else
                         {
-                            Debug.WriteLine($"BluetoothSocket is Disconnected");
+                            Debug.WriteLine($"BluetoothSocket is Disconnected, Trying Connect");
                             mmSocket.Connect();
+                            this.Write(mMessageGenerator.InitializeMotor(Home.OpenGloveConfiguration.PositivePins));
+                            this.Write(mMessageGenerator.InitializeMotor(Home.OpenGloveConfiguration.NegativePins));
+                            mapping =  (int)FlexorsRegion.ThumbInterphalangealJoint;
+                            this.Write(mMessageGenerator.addFlexor(Home.OpenGloveConfiguration.FlexorPins[mapping], mapping));
                         }
                     }
                     catch (Java.IO.IOException e)
@@ -420,7 +447,7 @@ namespace OpenGloveApp.Droid.Bluetooth
 
                             //Raise the event to UI thread, that need stay subscriber to this publisher thread
                             //Send the current thread id and send Message
-                            OnBluetootDataReceived(this.Id, this.mmDeviceName, line);
+                            OnBluetoothDataReceived(this.Id, this.mmDeviceName, line);
                         }
                         else
                         {

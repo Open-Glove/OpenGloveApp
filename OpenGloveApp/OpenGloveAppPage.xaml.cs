@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using OpenGloveApp.OpenGloveAPI;
 using OpenGloveApp.Server;
 using System.Diagnostics;
+using OpenGloveApp.Pages;
 
 namespace OpenGloveApp
 {
@@ -28,7 +29,7 @@ namespace OpenGloveApp
         public static List<int> mPins = new List<int> { 11, 12, 10, 15, 9, 16, 3, 2, 6, 8 };
         public static List<string> mValuesON = new List<string> { "HIGH", "LOW", "HIGH", "LOW", "HIGH", "LOW", "HIGH", "LOW", "HIGH", "LOW" };
         public static List<string> mValuesOFF = new List<string> { "LOW", "LOW", "LOW", "LOW", "LOW", "LOW", "LOW", "LOW", "LOW", "LOW" };
-
+        
         // Flexor pins: 17 and  + and -
         public List<int> mFlexorPins = new List<int> { 17 };
         public List<int> mFlexorMapping = new List<int> { 8 }; //values of 0 to 10 for flexor mapping
@@ -53,7 +54,7 @@ namespace OpenGloveApp
                 if (e.Message != null)
                 {
                     OnBluetoothMessageHandler(e);
-                    Debug.WriteLine(e.Message);
+                    //Debug.WriteLine(e.Message);
                 }
             });
         }
@@ -74,7 +75,7 @@ namespace OpenGloveApp
                         case "f":
                             mapping = Int32.Parse(words[1]);
                             value = Int32.Parse(words[2]);
-                            progressBar_flexor_value.Progress = value;
+                            progressBar_flexor_value.Progress = (float) value/100;
                             label_flexor_value.Text = value.ToString();
                             //fingersFunction?.Invoke(mapping, value);
                             break;
@@ -125,22 +126,25 @@ namespace OpenGloveApp
 
         void ButtonActivateMotor_Clicked(object sender, System.EventArgs e)
         {
+            /*
             if (!isMotorInitialize)
             {
                 OnBluetoothMessageSended(INITIALIZE_MOTORS, mPins, mValuesOFF);
                 isMotorInitialize = true;
             }
+            */
+
 
             if (isMotorActive)
             {
                 buttonActivateMotor.Text = "Motor OFF";
-                OnBluetoothMessageSended(DISABLE_MOTORS, mPins, mValuesOFF);
+                OnBluetoothMessageSended(DISABLE_MOTORS, Home.OpenGloveConfiguration.PositivePins, Home.OpenGloveConfiguration.ValuesOFF);
                 isMotorActive = false;
             }
             else
             {
                 buttonActivateMotor.Text = "Motor ON";
-                OnBluetoothMessageSended(ACTIVATE_MOTORS, mPins, mValuesON);
+                OnBluetoothMessageSended(ACTIVATE_MOTORS, Home.OpenGloveConfiguration.PositivePins, Home.OpenGloveConfiguration.ValuesON);
                 isMotorActive = true;
             }
         }

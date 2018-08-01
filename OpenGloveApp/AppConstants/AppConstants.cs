@@ -47,9 +47,122 @@ namespace OpenGloveApp.AppConstants
         public static readonly string ColorText = "#737474";
     }
 
-    public static class OpenGloveActions
+    public enum OpenGloveActions
     {
-        public static readonly int ACTIVATE_MOTORS = 1;
-        public static readonly int DEACTIVATE_MOTORS = 2;
+        StartCaptureData = 0,
+        StopCaptureData,
+        UpdateDevices,
+        GetDataReceiver,
+        AddFlexor,
+        RemoveFlexor,
+        CalibrateFlexors,
+        ConfirmCalibration,
+        SetThreshold,
+        ResetFlexors,
+        StartIMU,
+        SetIMUStatus,
+        SetRawData,
+        SetLoopDelay,
+        Connect,
+        Disconnect,
+        ActivateActuators,
+        SaveGlove = 17
+    }
+
+    public enum PalmarRegion
+    {
+        FingerSmallDistal,
+        FingerRingDistal,
+        FingerMiddleDistal,
+        FingerIndexDistal,
+
+        FingerSmallMiddle,
+        FingerRingMiddle,
+        FingerMiddleMiddle,
+        FingerIndexMiddle,
+
+        FingerSmallProximal,
+        FingerRingProximal,
+        FingerMiddleProximal,
+        FingerIndexProximal,
+
+        PalmSmallDistal,
+        PalmRingDistal,
+        PalmMiddleDistal,
+        PalmIndexDistal,
+
+        PalmSmallProximal,
+        PalmRingProximal,
+        PalmMiddleProximal,
+        PalmIndexProximal,
+
+        HypoThenarSmall,
+        HypoThenarRing,
+        ThenarMiddle,
+        ThenarIndex,
+
+        FingerThumbProximal,
+        FingerThumbDistal,
+
+        HypoThenarDistal,
+        Thenar,
+
+        HypoThenarProximal
+    }
+
+    public enum DorsalRegion
+    {
+        FingerSmallDistal = 29,
+        FingerRingDistal,
+        FingerMiddleDistal,
+        FingerIndexDistal,
+
+        FingerSmallMiddle,
+        FingerRingMiddle,
+        FingerMiddleMiddle,
+        FingerIndexMiddle,
+
+        FingerSmallProximal,
+        FingerRingProximal,
+        FingerMiddleProximal,
+        FingerIndexProximal,
+
+        PalmSmallDistal,
+        PalmRingDistal,
+        PalmMiddleDistal,
+        PalmIndexDistal,
+
+        PalmSmallProximal,
+        PalmRingProximal,
+        PalmMiddleProximal,
+        PalmIndexProximal,
+
+        HypoThenarSmall,
+        HypoThenarRing,
+        ThenarMiddle,
+        ThenarIndex,
+
+        FingerThumbProximal,
+        FingerThumbDistal,
+
+        HypoThenarDistal,
+        Thenar,
+
+        HypoThenarProximal
+    }
+
+    public enum FlexorsRegion
+    {
+        ThumbInterphalangealJoint = 0,
+        IndexInterphalangealJoint,
+        MiddleInterphalangealJoint,
+        RingInterphalangealJoint,
+        SmallInterphalangealJoint,
+
+        ThumbMetacarpophalangealJoint,
+        IndexMetacarpophalangealJoint,
+        MiddleMetacarpophalangealJoint,
+        RingMetacarpophalangealJoint,
+        SmallMetacarpophalangealJoint
     }
 }

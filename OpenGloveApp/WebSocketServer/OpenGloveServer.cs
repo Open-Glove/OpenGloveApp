@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Fleck;
-using OpenGloveApp.CustomEventArgs;
 using OpenGloveApp.AppConstants;
+using OpenGloveApp.CustomEventArgs;
+using OpenGloveApp.Models;
 
 namespace OpenGloveApp.Server
 {
@@ -14,7 +15,7 @@ namespace OpenGloveApp.Server
         private WebSocketServer server; // sample "ws://127.0.0.1:7070"
         private List<IWebSocketConnection> allSockets = new List<IWebSocketConnection>();
         private static Dictionary<string, IWebSocketConnection> webSocketByDeviceName = new Dictionary<string, IWebSocketConnection>();
-        public event EventHandler<WebSocketEventArgs> WebSocketDataReceived;
+        public static event EventHandler<WebSocketEventArgs> WebSocketDataReceived;
 
 
         public OpenGloveServer(string url)
@@ -59,7 +60,7 @@ namespace OpenGloveApp.Server
          * Regions:     a list of regions to activate (int)
         */
         // Handle Message from WebSocket Client
-        public void HandleMessage(IWebSocketConnection socket, string message)
+        private void HandleMessage(IWebSocketConnection socket, string message)
         {
             Debug.WriteLine(message);
             string[] words;
@@ -68,23 +69,26 @@ namespace OpenGloveApp.Server
             {
                 try
                 {
-                    words = message.Split(',');
-                    switch (words[0])
+                    words = message.Split(';');
+                    int action = Int32.Parse(words[0]);
+                    switch (action)
                     {
-                        case "ReadDataFrom":
+                        case (int) OpenGloveActions.StartCaptureData:
                             webSocketByDeviceName.Add(words[1], socket);
                             break;
-                        case "StopReadDataFrom":
+                        case (int) OpenGloveActions.StopCaptureData:
                             webSocketByDeviceName.Remove(words[1]);
                             break;
-                        case "Activate":
-                            //OnWebSocketDataReceived(OpenGloveActions.ACTIVATE_MOTORS, words[1], );
-                            break;
-                        case "hello":
-                            socket.Send("world!");
+                        case (int) OpenGloveActions.ActivateActuators:
+                            // Transform string to list of regions and intensities
+                            List<int> regions = words[2].Split(',').Select(int.Parse).ToList();
+                            List<string> instensities = words[3].Split(',').ToList();
+                            //List<Actuator> actuators = 
+
+                            //OnWebSocketDataReceived(OpenGloveActions.ActivateActuators, words[1], );
                             break;
                         default:
-                            socket.Send(message);
+                            socket.Send("You said: " + message); // test echo message
                             break;
                     }
                 }
@@ -115,11 +119,16 @@ namespace OpenGloveApp.Server
 
         // Method for raise event: 
 
-        protected virtual void OnWebSocketDataReceived(int what, string deviceName, string message)
+        protected virtual void OnWebSocketDataReceived(int what, string deviceName, List<int> regions, List<int> intensities, string message)
         {
             if (WebSocketDataReceived != null)
                 WebSocketDataReceived(this, new WebSocketEventArgs()
                 { What = what, DeviceName = deviceName, Message = message });
+        }
+
+        protected virtual void OnWebSocketDataReceived()
+        {
+            
         }
 
 
