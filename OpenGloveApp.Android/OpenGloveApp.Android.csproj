@@ -181,6 +181,11 @@
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_save.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\ic_help_outline.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\ic_save.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\ic_crop_original.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\ic_crop_original.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\ic_crop_original.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\ic_crop_original.png" />
+    <AndroidResource Include="Resources\drawable\ic_crop_original.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

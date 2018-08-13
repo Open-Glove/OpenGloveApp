@@ -12,12 +12,13 @@
     <PackageReference Include="Xam.Plugins.Forms.ImageCircle" Version="3.0.0.5" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="WebSocketServer\" />
+    <Folder Include="Server\" />
     <Folder Include="Pages\" />
     <Folder Include="Extensions\" />
     <Folder Include="Pages\CustomListItem\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Pages\DevicePage.xaml.cs" />
+    <Compile Remove="WebSocketServer\Server.cs" />
   </ItemGroup>
 </Project>

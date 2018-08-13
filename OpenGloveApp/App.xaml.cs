@@ -11,7 +11,7 @@ namespace OpenGloveApp
         public App()
         {
             InitializeComponent();
-            /*
+
             NavigationPage navigationPage = new NavigationPage(new Home())
             {
                 BarTextColor = Color.White,
@@ -22,9 +22,9 @@ namespace OpenGloveApp
             Current.Resources["primary_dark"] = AppConstants.Colors.ColorPrimaryDark;
             Current.Resources["color_accent"] = AppConstants.Colors.ColorAccent;
             Current.Resources["color_text"] = AppConstants.Colors.ColorText;
-            */
 
-            MainPage = new OpenGloveAppPage(); //navigationPage;
+
+            MainPage = navigationPage; //new OpenGloveAppPage();
         }
 
         protected override void OnStart()

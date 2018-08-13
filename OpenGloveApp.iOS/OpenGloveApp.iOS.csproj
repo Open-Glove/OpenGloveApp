@@ -201,5 +201,8 @@
     <BundleResource Include="Resources\ic_save.png" />
     <BundleResource Include="Resources\ic_save%402x.png" />
     <BundleResource Include="Resources\ic_save%403x.png" />
+    <BundleResource Include="Resources\ic_crop_original.png" />
+    <BundleResource Include="Resources\ic_crop_original%402x.png" />
+    <BundleResource Include="Resources\ic_crop_original%403x.png" />
   </ItemGroup>
 </Project>

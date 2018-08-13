@@ -230,7 +230,7 @@ namespace OpenGloveApp.Droid.Bluetooth
                     mmInputStreamReader = new StreamReader(mmSocket.InputStream);
                     mmOutputStream = mmSocket.OutputStream;
                     this.BluetoothDataReceived += Server.OpenGloveServer.OnBluetoothMessage; // The WebSocket Server subscribe to this instance of ConnectedThread (Bluetooth Device)
-                    Server.OpenGloveServer.WebSocketDataReceived += this.OnWebSocketServerMessage; // The Thread subscribe to WebSocket Server
+                    Server.OpenGloveServer.WebSocketMessageReceived += this.OnWebSocketServerMessage; // The Thread subscribe to WebSocket Server
 
                 }
                 catch (System.IO.IOException e)
@@ -376,6 +376,7 @@ namespace OpenGloveApp.Droid.Bluetooth
                 this.Write(mMessageGenerator.InitializeMotor(Home.OpenGloveConfiguration.PositivePins));
                 this.Write(mMessageGenerator.InitializeMotor(Home.OpenGloveConfiguration.NegativePins));
                 int mapping = (int)FlexorsRegion.ThumbInterphalangealJoint;
+                //TODO Changue to a function that add all Mapping flexors in OpenGloveConfiguration
                 this.Write(mMessageGenerator.addFlexor(Home.OpenGloveConfiguration.FlexorPins[mapping], mapping));
 
                 while (true)

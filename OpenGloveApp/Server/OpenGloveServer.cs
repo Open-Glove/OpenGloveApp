@@ -5,27 +5,24 @@ using System.Linq;
 using Fleck;
 using OpenGloveApp.AppConstants;
 using OpenGloveApp.CustomEventArgs;
-using OpenGloveApp.Models;
 
 namespace OpenGloveApp.Server
 {
-    public class OpenGloveServer
+    public class OpenGloveServer: Server
     {
+        public static event EventHandler<WebSocketEventArgs> WebSocketMessageReceived;
+
         private string url;
         private WebSocketServer server; // sample "ws://127.0.0.1:7070"
         private List<IWebSocketConnection> allSockets = new List<IWebSocketConnection>();
         private static Dictionary<string, IWebSocketConnection> webSocketByDeviceName = new Dictionary<string, IWebSocketConnection>();
-        public static event EventHandler<WebSocketEventArgs> WebSocketDataReceived;
+
+        //public static List<OpenGlove>
 
 
         public OpenGloveServer(string url)
         {
             this.url = url;
-        }
-
-        public void ConfigureServer()
-        {
-            server.RestartAfterListenError = true;
         }
 
         public void StartWebsockerServer()
@@ -100,7 +97,14 @@ namespace OpenGloveApp.Server
 
         }
 
-        // Event Handler subcribe to Data from OpenGloves Devices
+        // Method for raise event to subcribers (aka. Connected Thread on Communication implementation iOS/Android of OpenGlove devices)
+        protected virtual void OnWebSocketMessageReceived(int what, string deviceName, List<int> regions, List<int> intensities, string message)
+        {
+            WebSocketMessageReceived?.Invoke(this, new WebSocketEventArgs()
+            { What = what, DeviceName = deviceName, Message = message });
+        }
+
+        // Method for subcribe to messages from OpenGlove Devices
         public static void OnBluetoothMessage(object source, BluetoothEventArgs e)
         {
             SendDataIfWebSocketRequestedDataFromDevice(e);
@@ -110,45 +114,35 @@ namespace OpenGloveApp.Server
         {
             if (e.Message != null)
             {
-                Debug.WriteLine($" [{e.DeviceName}] OpenGloveServer.OnBluetoothMessage: {e.Message}");
-
+                //Debug.WriteLine($" [{e.DeviceName}] OpenGloveServer.OnBluetoothMessage: {e.Message}");
                 if (webSocketByDeviceName.ContainsKey(e.DeviceName))
                     webSocketByDeviceName[e.DeviceName].Send(e.Message);
             }
         }
-
-        // Method for raise event: 
-
-        protected virtual void OnWebSocketDataReceived(int what, string deviceName, List<int> regions, List<int> intensities, string message)
-        {
-            if (WebSocketDataReceived != null)
-                WebSocketDataReceived(this, new WebSocketEventArgs()
-                { What = what, DeviceName = deviceName, Message = message });
-        }
-
-        protected virtual void OnWebSocketDataReceived()
-        {
-            
-        }
-
 
         public void CloseAllSockets()
         {
             allSockets.ToList().ForEach(s => s.Close());
         }
 
-        public void Start()
+        override public void Start()
         {
             this.server = new WebSocketServer(url);
             ConfigureServer();
             StartWebsockerServer();
         }
 
-        public void Stop()
+        override public void Stop()
         {
             CloseAllSockets();
             server.Dispose(); //this method does not allow more incoming connections, and disconnect the server. So it is necessary to disconnect all sockets first to cut off all communication
             allSockets.Clear();
         }
+
+        override public void ConfigureServer()
+        {
+            server.RestartAfterListenError = true;
+        }
+
     }
 }

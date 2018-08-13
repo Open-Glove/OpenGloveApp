@@ -12,11 +12,11 @@ namespace OpenGloveApp.OpenGloveAPI
         /// <summary>
         /// An OpenGlove communication module instance.
         /// </summary>
-        ICommunication communication = DependencyService.Get<ICommunication>();
+        public ICommunication communication = DependencyService.Get<ICommunication>();
         /// <summary>
         /// An OpenGlove message generator module instance.
         /// </summary>
-        MessageGenerator messageGenerator = new MessageGenerator();
+        public MessageGenerator messageGenerator = new MessageGenerator();
 
         /// <summary>
         /// Open the communication with the port and baudrate specified
