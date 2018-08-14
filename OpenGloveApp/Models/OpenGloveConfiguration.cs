@@ -5,6 +5,7 @@ namespace OpenGloveApp.Models
 {
     public class OpenGloveConfiguration
     {
+        public string FileName { get; set; }
         public List<int> Pins;
         public List<int> PositivePins;
         public List<int> NegativePins;
@@ -28,7 +29,7 @@ namespace OpenGloveApp.Models
             //this.ActuatorsByMapping.Add((int) AppConstants.PalmarRegion.FingerSmallDistal, ActuatorsList[0]); 
             //this.ActuatorsByMapping.Add((int) AppConstants.PalmarRegion.FingerRingDistal, ActuatorsList[1]);
 
-            this.FlexorsByMapping.Add((int) AppConstants.FlexorsRegion.ThumbInterphalangealJoint, FlexorPins[0]);
+            //this.FlexorsByMapping.Add((int) AppConstants.FlexorsRegion.ThumbInterphalangealJoint, FlexorPins[0]);
         }
 
         public List<int> GetPinsOfActuators()

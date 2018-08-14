@@ -9,7 +9,8 @@ namespace OpenGloveApp.Pages
     public partial class ConfigurationPage : ContentPage
     {
         public static List<string> OpenGloveConfigurations = new List<string> {"OpenGloveIZQ.xml", "OpenGloveDER.xml", "Helmet.xml", "Jacket"};
-        public static OpenGloveConfiguration OpenGloveConfiguration = new OpenGloveConfiguration();
+        public static OpenGloveConfiguration CurrentOpenGloveConfiguration = new OpenGloveConfiguration();
+
 
         public ConfigurationPage()
         {

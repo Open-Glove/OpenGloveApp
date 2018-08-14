@@ -283,17 +283,62 @@ namespace OpenGloveApp.Droid.Bluetooth
                     {
                         case (int)OpenGloveActions.StartCaptureData:
                             break;
+
                         case (int)OpenGloveActions.StopCaptureData:
                             break;
+
+                        case (int)OpenGloveActions.AddFlexor:
+                            message = mMessageGenerator.addFlexor(e.Pin, e.Region);
+                            this.Write(message);
+                            break;
+
+                        case (int)OpenGloveActions.AddFlexors:
+                            if (NoNullAndEqualCount(e.Pins, e.Regions))
+                            {
+                                for (int i = 0; i < e.Pins.Count; i++)
+                                {
+                                    message = mMessageGenerator.addFlexor(e.Pins[i], e.Regions[i]);
+                                    this.Write(message);
+                                }
+                            }
+                            break;
+
+                        case (int)OpenGloveActions.RemoveFlexor:
+                            message = mMessageGenerator.removeFlexor(e.Region);
+                            this.Write(message);
+                            break;
+
+                        case (int)OpenGloveActions.RemoveFlexors:
+                            if (e.Regions != null)
+                            {
+                                for (int i = 0; i < e.Regions.Count; i++)
+                                {
+                                    message = mMessageGenerator.removeFlexor(e.Regions[i]);
+                                    this.Write(message);
+                                }
+                            }
+                            break;
+
                         case (int)OpenGloveActions.ActivateActuators:
                             message = mMessageGenerator.ActivateMotor(e.Pins, e.Values);
                             this.Write(message);
                             break;
+
                         default:
                             break;
                     }
                 }
 
+            }
+
+            public bool NoNullAndEqualCount(List<int> list1, List<int> list2)
+            {
+                if(list1 != null & list2 != null)
+                {
+                    if(list1.Count == list2.Count)
+                        return true;
+                }
+                return false;
             }
 
             //Handle event from UI thread
@@ -368,16 +413,57 @@ namespace OpenGloveApp.Droid.Bluetooth
                 }
             }
 
+            /*
+            public void FlexorsInitializer()
+            {
+                if (Home.OpenGloveConfiguration.FlexorsByMapping != null)
+                foreach (var flexorByMapping in Home.OpenGloveConfiguration.FlexorsByMapping)
+                {
+                    this.Write(mMessageGenerator.addFlexor(Home.OpenGloveConfiguration.FlexorPins[flexorByMapping.Key], flexorByMapping.Key));
+                }
+            }
+
+            public void ActuatorsInitializer()
+            {
+                if (Home.OpenGloveConfiguration.PositivePins != null)
+                    this.Write(mMessageGenerator.InitializeMotor(Home.OpenGloveConfiguration.PositivePins));
+                if (Home.OpenGloveConfiguration.NegativePins != null)
+                this.Write(mMessageGenerator.InitializeMotor(Home.OpenGloveConfiguration.NegativePins));
+            }
+            */
+
+            public void FlexorsInitializer()
+            {
+                if (Server.OpenGloveServer.OpenGloveByDeviceName.ContainsKey(this.mmDeviceName))
+                {
+                    OpenGlove openGlove = Server.OpenGloveServer.OpenGloveByDeviceName[this.mmDeviceName];
+                    foreach (var flexorByMapping in  openGlove.Configuration.FlexorsByMapping)
+                    {
+                        this.Write(mMessageGenerator.addFlexor(openGlove.Configuration.FlexorPins[flexorByMapping.Key], flexorByMapping.Key));
+                    }
+                }
+            }
+
+            public void ActuatorsInitializer()
+            {
+                if (Server.OpenGloveServer.OpenGloveByDeviceName.ContainsKey(this.mmDeviceName))
+                {
+                    OpenGlove openGlove = Server.OpenGloveServer.OpenGloveByDeviceName[this.mmDeviceName];
+                    if (openGlove.Configuration.PositivePins != null)
+                        this.Write(mMessageGenerator.InitializeMotor(openGlove.Configuration.PositivePins));
+                    if (openGlove.Configuration.NegativePins!= null)
+                        this.Write(mMessageGenerator.InitializeMotor(openGlove.Configuration.NegativePins));
+                }
+            }
+
+
             private void FlexorCapture()
             {
                 // Keep listening to the InputStream whit a StreamReader until an exception occurs
                 string line;
-                // TODO Update this code when OG Configuration is dinamic Load Configuration on OpenGlove
-                this.Write(mMessageGenerator.InitializeMotor(Home.OpenGloveConfiguration.PositivePins));
-                this.Write(mMessageGenerator.InitializeMotor(Home.OpenGloveConfiguration.NegativePins));
-                int mapping = (int)FlexorsRegion.ThumbInterphalangealJoint;
-                //TODO Changue to a function that add all Mapping flexors in OpenGloveConfiguration
-                this.Write(mMessageGenerator.addFlexor(Home.OpenGloveConfiguration.FlexorPins[mapping], mapping));
+
+                ActuatorsInitializer();
+                FlexorsInitializer();
 
                 while (true)
                 {
@@ -395,10 +481,8 @@ namespace OpenGloveApp.Droid.Bluetooth
                         {
                             Debug.WriteLine($"BluetoothSocket is Disconnected, Trying Connect");
                             mmSocket.Connect();
-                            this.Write(mMessageGenerator.InitializeMotor(Home.OpenGloveConfiguration.PositivePins));
-                            this.Write(mMessageGenerator.InitializeMotor(Home.OpenGloveConfiguration.NegativePins));
-                            mapping =  (int)FlexorsRegion.ThumbInterphalangealJoint;
-                            this.Write(mMessageGenerator.addFlexor(Home.OpenGloveConfiguration.FlexorPins[mapping], mapping));
+                            ActuatorsInitializer();
+                            FlexorsInitializer();
                         }
                     }
                     catch (Java.IO.IOException e)

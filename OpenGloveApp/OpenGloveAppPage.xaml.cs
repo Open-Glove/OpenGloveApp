@@ -35,8 +35,7 @@ namespace OpenGloveApp
         public List<int> mFlexorMapping = new List<int> { 8 }; //values of 0 to 10 for flexor mapping
         public List<string> mFlexorPinsMode = new List<string> { "OUTPUT" };
 
-        public OpenGlove mOpenGlove = new OpenGlove();
-        //public OpenGloveServer mServer = new OpenGloveServer("ws://127.0.0.1:7070"); //127.0.0.1 = localhost
+        public OpenGlove mOpenGlove = new OpenGlove(new OpenGloveConfiguration());
 
         public OpenGloveAppPage()
         {
@@ -134,17 +133,16 @@ namespace OpenGloveApp
             }
             */
 
-
             if (isMotorActive)
             {
                 buttonActivateMotor.Text = "Motor OFF";
-                OnBluetoothMessageSended(DISABLE_MOTORS, Home.OpenGloveConfiguration.PositivePins, Home.OpenGloveConfiguration.ValuesOFF);
+                OnBluetoothMessageSended(DISABLE_MOTORS,  mOpenGlove.Configuration.PositivePins, mOpenGlove.Configuration.ValuesOFF);
                 isMotorActive = false;
             }
             else
             {
                 buttonActivateMotor.Text = "Motor ON";
-                OnBluetoothMessageSended(ACTIVATE_MOTORS, Home.OpenGloveConfiguration.PositivePins, Home.OpenGloveConfiguration.ValuesON);
+                OnBluetoothMessageSended(ACTIVATE_MOTORS, mOpenGlove.Configuration.PositivePins, mOpenGlove.Configuration.ValuesON);
                 isMotorActive = true;
             }
         }

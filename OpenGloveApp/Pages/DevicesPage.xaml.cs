@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using OpenGloveApp.Models;
+using OpenGloveApp.OpenGloveAPI;
+using OpenGloveApp.Server;
 using Xamarin.Forms;
 
 namespace OpenGloveApp.Pages
@@ -26,9 +28,6 @@ namespace OpenGloveApp.Pages
                 default:
                     break;
             }
-
-
-
         }
 
         void Handle_Activated(object sender, System.EventArgs e)
@@ -44,7 +43,14 @@ namespace OpenGloveApp.Pages
             //Blocking call
             if (connect)
             {
-                Home.OpenGlove.OpenDeviceConnection(device); //Blocking call
+                //call the config asociate to this OpenGlove device if exist in this Page
+                OpenGloveConfiguration openGloveConfiguration = new OpenGloveConfiguration();
+                OpenGlove openGlove = new OpenGlove(device.Name, openGloveConfiguration);
+
+                if(!OpenGloveServer.OpenGloveByDeviceName.ContainsKey(device.Name))
+                    OpenGloveServer.OpenGloveByDeviceName.Add(device.Name, openGlove);
+
+                OpenGloveServer.OpenGloveByDeviceName[device.Name].OpenDeviceConnection(device); //Blocking call
             }
         }
 

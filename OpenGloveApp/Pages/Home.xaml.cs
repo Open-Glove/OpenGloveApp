@@ -9,13 +9,12 @@ namespace OpenGloveApp.Pages
    
     public partial class Home : BottomBarPage
     {
-        public static OpenGlove OpenGlove = new OpenGlove();
-        public static OpenGloveConfiguration OpenGloveConfiguration = new OpenGloveConfiguration();
+        // For manage the current OpenGlove Bluetooth Device Configuration
+        public static OpenGlove OpenGlove = new OpenGlove(new OpenGloveConfiguration());
 
         public Home()
         {
             InitializeComponent();
-
             switch(DeviceRuntime)
             {
                 case Device_Android:

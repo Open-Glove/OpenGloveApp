@@ -4,7 +4,6 @@ namespace OpenGloveApp.OpenGloveAPI
 {
     public class OpenGlove : LegacyOpenGlove
     {
-        public string Name { get; set; }
         public string BluetoothDeviceName { get; set; }
         public OpenGloveConfiguration Configuration { get; set; }
 
@@ -16,6 +15,13 @@ namespace OpenGloveApp.OpenGloveAPI
         public OpenGlove(OpenGloveConfiguration configuration)
             : base()
         {
+            this.Configuration = configuration;
+        }
+
+        public OpenGlove(string bluetoothDeviceName, OpenGloveConfiguration configuration)
+            : base()    
+        {
+            this.BluetoothDeviceName = bluetoothDeviceName;
             this.Configuration = configuration;
         }
     }
