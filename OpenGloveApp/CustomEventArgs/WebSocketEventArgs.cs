@@ -12,6 +12,7 @@ namespace OpenGloveApp.CustomEventArgs
         public List<int> Intensities { get; set; }
         public int Pin { get; set; }
         public List<int> Pins { get; set; }
+        public string Value { get; set; }
         public List<string> Values { get; set; }
         public string Message { get; set; }
     }

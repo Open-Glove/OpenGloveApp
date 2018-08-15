@@ -13,6 +13,8 @@ namespace OpenGloveApp.Pages
         {
             InitializeComponent();
 
+            listViewBoundedDevices.IsPullToRefreshEnabled = true;
+
             switch(Device.RuntimePlatform)
             {
                 case Device.iOS:
@@ -29,6 +31,8 @@ namespace OpenGloveApp.Pages
                     break;
             }
         }
+
+
 
         void Handle_Activated(object sender, System.EventArgs e)
         {
@@ -49,7 +53,7 @@ namespace OpenGloveApp.Pages
 
                 if(!OpenGloveServer.OpenGloveByDeviceName.ContainsKey(device.Name))
                     OpenGloveServer.OpenGloveByDeviceName.Add(device.Name, openGlove);
-
+                
                 OpenGloveServer.OpenGloveByDeviceName[device.Name].OpenDeviceConnection(device); //Blocking call
             }
         }

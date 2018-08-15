@@ -85,7 +85,8 @@ namespace OpenGloveApp.Server
             Debug.WriteLine(message);
             string[] words;
             int MinCountMessageSplit = 2; // ACTION;DEVICE
-            int MaxCountMessageSplit = 4; // ACTION;DEVICE;REGION;VALUE
+            int MaxCountMessageSplit = 4; // ACTION;DEVICE;REGIONS;VALUES
+            int CountMessageSplit = 4;
 
             if (message != null)
             {
@@ -99,30 +100,14 @@ namespace OpenGloveApp.Server
                     string regions = null;
                     string values = null; // intensities or pins
 
-                    if(count >= MinCountMessageSplit && count <= MaxCountMessageSplit)
+                    if(count == CountMessageSplit)
                     {
-                        if(count == 2)
-                        {
-                            action = Int32.Parse(words[0]);
-                            deviceName = words[1];
-                        }
+                        action = Int32.Parse(words[0]);
+                        deviceName = words[1];
+                        regions = words[2];
+                        values = words[3]; // intensities or pins
 
-                        if (count == 3)
-                        {
-                            action = Int32.Parse(words[0]);
-                            deviceName = words[1];
-                            regions = words[2];
-                        }
-
-                        if(count == 4)
-                        {
-                            action = Int32.Parse(words[0]);
-                            deviceName = words[1];
-                            regions = words[2];
-                            values = words[3]; // intensities or pins
-                        }
-
-                        OnWebSocketMessageReceived(socket, message, action, deviceName, regions, values);
+                        SwitchOpenGloveActions(socket, message, action, deviceName, regions, values);
                     }
                 }
                 catch
@@ -133,16 +118,18 @@ namespace OpenGloveApp.Server
 
         }
 
-        // Method for raise event to subcribers (aka. Connected Thread on Communication implementation iOS/Android of OpenGlove devices)
-        protected virtual void OnWebSocketMessageReceived(IWebSocketConnection socket, string message, int what, string deviceName, string regions, string values)
+        public void SwitchOpenGloveActions(IWebSocketConnection socket, string message, int what, string deviceName, string regions, string values)
         {
             int Region = -1;
             List<int> Regions = null;
             List<int> Intensities = null;
             int Pin = -1;
             List<int> Pins = null;
+            string Value = null;
             List<string> Values = null;
-            try {
+
+            try
+            {
                 switch (what)
                 {
                     case (int)OpenGloveActions.StartCaptureData:
@@ -156,27 +143,59 @@ namespace OpenGloveApp.Server
                     case (int)OpenGloveActions.AddFlexor:
                         Region = Int32.Parse(regions);
                         Pin = Int32.Parse(values);
-                        WebSocketMessageReceived?.Invoke(this, new WebSocketEventArgs()
-                        { What = what, DeviceName = deviceName, Message = message, Region = Region, Pin = Pin });
+                        OpenGloveByDeviceName[deviceName].AddFlexor(Pin, Region);
                         break;
 
                     case (int)OpenGloveActions.AddFlexors:
                         Regions = regions.Split(',').Select(int.Parse).ToList();
                         Pins = values.Split(',').Select(int.Parse).ToList();
-                        WebSocketMessageReceived?.Invoke(this, new WebSocketEventArgs()
-                        { What = what, DeviceName = deviceName, Message = message, Regions = Regions, Pins = Pins });
+                        OpenGloveByDeviceName[deviceName].AddFlexors(Pins, Regions);
                         break;
 
                     case (int)OpenGloveActions.RemoveFlexor:
                         Region = Int32.Parse(regions);
-                        WebSocketMessageReceived?.Invoke(this, new WebSocketEventArgs()
-                        { What = what, DeviceName = deviceName, Message = message, Region = Region });
+                        OpenGloveByDeviceName[deviceName].RemoveFlexor(Region);
                         break;
 
                     case (int)OpenGloveActions.RemoveFlexors:
                         Regions = regions.Split(',').Select(int.Parse).ToList();
-                        WebSocketMessageReceived?.Invoke(this, new WebSocketEventArgs()
-                        { What = what, DeviceName = deviceName, Message = message, Regions = Regions });
+                        OpenGloveByDeviceName[deviceName].RemoveFlexors(Regions);
+                        break;
+
+                    case (int)OpenGloveActions.CalibrateFlexors:
+                        OpenGloveByDeviceName[deviceName].CalibrateFlexors();
+                        break;
+
+                    case (int)OpenGloveActions.ConfirmCalibration:
+                        OpenGloveByDeviceName[deviceName].ConfirmCalibration();
+                        break;
+
+                    case (int)OpenGloveActions.SetThreshold:
+                        Value = values.Split(',')[0];
+                        OpenGloveByDeviceName[deviceName].SetThreshold(Int32.Parse(Value));
+                        break;
+
+                    case (int)OpenGloveActions.ResetFlexors:
+                        OpenGloveByDeviceName[deviceName].ResetFlexors();
+                        break;
+
+                    case (int)OpenGloveActions.StartIMU:
+                        OpenGloveByDeviceName[deviceName].StartIMU();
+                        break;
+
+                    case (int)OpenGloveActions.SetIMUStatus:
+                        Value = values.Split(',')[0];
+                        OpenGloveByDeviceName[deviceName].SetIMUStatus(bool.Parse(Value));
+                        break;
+
+                    case (int)OpenGloveActions.SetRawData:
+                        Value = values.Split(',')[0];
+                        OpenGloveByDeviceName[deviceName].SetRawData(bool.Parse(Value));
+                        break;
+
+                    case (int)OpenGloveActions.SetLoopDelay:
+                        Value = values.Split(',')[0];
+                        OpenGloveByDeviceName[deviceName].SetLoopDelay(Int32.Parse(Value));
                         break;
 
                     case (int)OpenGloveActions.ActivateActuators:
@@ -191,25 +210,121 @@ namespace OpenGloveApp.Server
                         socket.Send("You said: " + message); // test echo message
                         break;
                 }
+            }
+            catch
+            {
+                Debug.WriteLine("WebSocketServer ERROR: BAD FORMAT OR TYPE DATA in OnWebSocketMessageReceived");
+            }
+        }
 
-                WebSocketMessageReceived?.Invoke(this, new WebSocketEventArgs()
+        // Method for raise event to subcribers (aka. Connected Thread on Communication implementation iOS/Android of OpenGlove devices)
+        protected virtual void OnWebSocketMessageReceived(IWebSocketConnection socket, string message, int what, string deviceName, string regions, string values)
+        {
+            int Region = -1;
+            List<int> Regions = null;
+            List<int> Intensities = null;
+            int Pin = -1;
+            List<int> Pins = null;
+            string Value = null;
+            List<string> Values = null;
+
+            try {
+                switch (what)
                 {
-                    What = what,
-                    DeviceName = deviceName,
-                    Message = message,
-                    Region = Region,
-                    Regions = Regions,
-                    Intensities = Intensities,
-                    Pin = Pin,
-                    Pins = Pins,
-                    Values = Values
-                });                
+                    case (int)OpenGloveActions.StartCaptureData:
+                        webSocketByDeviceName.Add(deviceName, socket);
+                        break;
+
+                    case (int)OpenGloveActions.StopCaptureData:
+                        webSocketByDeviceName.Remove(deviceName);
+                        break;
+
+                    case (int)OpenGloveActions.AddFlexor:
+                        Region = Int32.Parse(regions);
+                        Pin = Int32.Parse(values);
+                        OpenGloveByDeviceName[deviceName].AddFlexor(Pin, Region);
+                        break;
+
+                    case (int)OpenGloveActions.AddFlexors:
+                        Regions = regions.Split(',').Select(int.Parse).ToList();
+                        Pins = values.Split(',').Select(int.Parse).ToList();
+                        OpenGloveByDeviceName[deviceName].AddFlexors(Pins, Regions);
+                        break;
+
+                    case (int)OpenGloveActions.RemoveFlexor:
+                        Region = Int32.Parse(regions);
+                        OpenGloveByDeviceName[deviceName].RemoveFlexor(Region);
+                        break;
+
+                    case (int)OpenGloveActions.RemoveFlexors:
+                        Regions = regions.Split(',').Select(int.Parse).ToList();
+                        OpenGloveByDeviceName[deviceName].RemoveFlexors(Regions);
+                        break;
+
+                    case (int)OpenGloveActions.CalibrateFlexors:
+                        OpenGloveByDeviceName[deviceName].CalibrateFlexors();
+                        break;
+
+                    case (int)OpenGloveActions.ConfirmCalibration:
+                        OpenGloveByDeviceName[deviceName].ConfirmCalibration();
+                        break;
+
+                    case (int)OpenGloveActions.SetThreshold:
+                        Value = values.Split(',')[0];
+                        OpenGloveByDeviceName[deviceName].SetThreshold(Int32.Parse(Value));
+                        break;
+
+                    case (int)OpenGloveActions.ResetFlexors:
+                        OpenGloveByDeviceName[deviceName].ResetFlexors();
+                        break;
+
+                    case (int)OpenGloveActions.StartIMU:
+                        OpenGloveByDeviceName[deviceName].StartIMU();
+                        break;
+
+                    case (int)OpenGloveActions.SetIMUStatus:
+                        Value = values.Split(',')[0];
+                        OpenGloveByDeviceName[deviceName].SetIMUStatus(bool.Parse(Value));
+                        break;
+
+                    case (int)OpenGloveActions.SetRawData:
+                        Value = values.Split(',')[0];
+                        OpenGloveByDeviceName[deviceName].SetRawData(bool.Parse(Value));
+                        break;
+
+                    case (int)OpenGloveActions.SetLoopDelay:
+                        Value = values.Split(',')[0];
+                        OpenGloveByDeviceName[deviceName].SetLoopDelay(Int32.Parse(Value));
+                        break;
+
+                    case (int)OpenGloveActions.ActivateActuators:
+                        // Transform string to list of regions and intensities
+                        //List<int> regions = words[2].Split(',').Select(int.Parse).ToList();
+                        //List<string> instensities = words[3].Split(',').ToList();
+                        //List<Actuator> actuators = 
+
+                        //OnWebSocketDataReceived(OpenGloveActions.ActivateActuators, words[1], );
+                        break;
+                    default:
+                        socket.Send("You said: " + message); // test echo message
+                        break;
+                }
             } 
             catch 
             {
                 Debug.WriteLine("WebSocketServer ERROR: BAD FORMAT OR TYPE DATA in OnWebSocketMessageReceived");
             }
 
+        }
+
+        public bool NoNullAndEqualCount(List<int> list1, List<int> list2)
+        {
+            if (list1 != null & list2 != null)
+            {
+                if (list1.Count == list2.Count)
+                    return true;
+            }
+            return false;
         }
 
         // Method for subcribe to messages from OpenGlove Devices

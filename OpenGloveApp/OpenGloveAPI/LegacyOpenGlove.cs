@@ -267,18 +267,5 @@ namespace OpenGloveApp.OpenGloveAPI
             communication.Write(message);
         }
 
-        public List<BluetoothDevices> GetAllPairedDevices()
-        {
-            return communication.GetAllPairedDevices();
-        }
-
-        public void OpenDeviceConnection(BluetoothDevices bluetoothDevice)
-        {
-            communication.OpenDeviceConnection(bluetoothDevice);
-        }
-
-        public void OpenDeviceConnection(ContentPage contentPage, BluetoothDevices bluetoothDevice){
-            communication.OpenDeviceConnection(contentPage, bluetoothDevice);
-        }
     }
 }

@@ -230,7 +230,7 @@ namespace OpenGloveApp.Droid.Bluetooth
                     mmInputStreamReader = new StreamReader(mmSocket.InputStream);
                     mmOutputStream = mmSocket.OutputStream;
                     this.BluetoothDataReceived += Server.OpenGloveServer.OnBluetoothMessage; // The WebSocket Server subscribe to this instance of ConnectedThread (Bluetooth Device)
-                    Server.OpenGloveServer.WebSocketMessageReceived += this.OnWebSocketServerMessage; // The Thread subscribe to WebSocket Server
+                    //Server.OpenGloveServer.WebSocketMessageReceived += this.OnWebSocketServerMessage; // The Thread subscribe to WebSocket Server
 
                 }
                 catch (System.IO.IOException e)
@@ -266,19 +266,29 @@ namespace OpenGloveApp.Droid.Bluetooth
             // Method for raise the event: Bluetooth Socket (handled by thread) to WebSocket Server
             protected virtual void OnBluetoothDataReceived(long threadId, string deviceName, string message)
             {
-                if (BluetoothDataReceived != null)
-                    BluetoothDataReceived(this, new BluetoothEventArgs()
-                { ThreadId = threadId, DeviceName = deviceName, Message = message});
+                BluetoothDataReceived?.Invoke(this, new BluetoothEventArgs()
+                { ThreadId = threadId, DeviceName = deviceName, Message = message });
             }
 
+            // TODO delete this handler!!! is deprecated
             // Handle event from WebSocket Server data
             public void OnWebSocketServerMessage(object source, WebSocketEventArgs e)
             {
                 // Only accept message to Bluetooth Device managed for this ConnectedThread.
-                // Improve with specific listeners for each connected thread(openglove devices connected).
+                // TODO: Improve this with specific listeners for each connected thread(openglove devices connected).
                 if(e.DeviceName == mmDeviceName)
+                    SwitchOpenGloveActions(source, e);
+            }
+
+            public void SwitchOpenGloveActions(object source, WebSocketEventArgs e)
+            {
+                
+                string message;
+                bool boolParsed;
+                int status;
+
+                try
                 {
-                    string message;
                     switch (e.What)
                     {
                         case (int)OpenGloveActions.StartCaptureData:
@@ -318,6 +328,49 @@ namespace OpenGloveApp.Droid.Bluetooth
                                 }
                             }
                             break;
+                        case (int)OpenGloveActions.CalibrateFlexors:
+                            message = mMessageGenerator.calibrateFlexors();
+                            this.Write(message);
+                            break;
+
+                        case (int)OpenGloveActions.ConfirmCalibration:
+                            message = mMessageGenerator.confirmCalibration();
+                            this.Write(message);
+                            break;
+
+                        case (int)OpenGloveActions.SetThreshold:
+                            message = mMessageGenerator.setThreshold(Int32.Parse(e.Value));
+                            this.Write(message);
+                            break;
+
+                        case (int)OpenGloveActions.ResetFlexors:
+                            message = mMessageGenerator.resetFlexors();
+                            this.Write(message);
+                            break;
+
+                        case (int)OpenGloveActions.StartIMU:
+                            message = mMessageGenerator.startIMU();
+                            this.Write(message);
+                            break;
+
+                        case (int)OpenGloveActions.SetIMUStatus:
+                            boolParsed = bool.Parse(e.Value);
+                            status = (boolParsed) ? 1 : 0;
+                            message = mMessageGenerator.setIMUStatus(status);
+                            this.Write(message);
+                            break;
+
+                        case (int)OpenGloveActions.SetRawData:
+                            boolParsed = bool.Parse(e.Value);
+                            status = (boolParsed) ? 1 : 0;
+                            message = mMessageGenerator.setRawData(status);
+                            this.Write(message);
+                            break;
+
+                        case (int)OpenGloveActions.SetLoopDelay:
+                            message = mMessageGenerator.setLoopDelay(Int32.Parse(e.Value));
+                            this.Write(message);
+                            break;
 
                         case (int)OpenGloveActions.ActivateActuators:
                             message = mMessageGenerator.ActivateMotor(e.Pins, e.Values);
@@ -328,7 +381,10 @@ namespace OpenGloveApp.Droid.Bluetooth
                             break;
                     }
                 }
-
+                catch
+                {
+                    Debug.WriteLine("Communication ERROR: BAD FORMAT OR TYPE DATA in SwitchOpenGloveActions");
+                }
             }
 
             public bool NoNullAndEqualCount(List<int> list1, List<int> list2)
@@ -413,25 +469,6 @@ namespace OpenGloveApp.Droid.Bluetooth
                 }
             }
 
-            /*
-            public void FlexorsInitializer()
-            {
-                if (Home.OpenGloveConfiguration.FlexorsByMapping != null)
-                foreach (var flexorByMapping in Home.OpenGloveConfiguration.FlexorsByMapping)
-                {
-                    this.Write(mMessageGenerator.addFlexor(Home.OpenGloveConfiguration.FlexorPins[flexorByMapping.Key], flexorByMapping.Key));
-                }
-            }
-
-            public void ActuatorsInitializer()
-            {
-                if (Home.OpenGloveConfiguration.PositivePins != null)
-                    this.Write(mMessageGenerator.InitializeMotor(Home.OpenGloveConfiguration.PositivePins));
-                if (Home.OpenGloveConfiguration.NegativePins != null)
-                this.Write(mMessageGenerator.InitializeMotor(Home.OpenGloveConfiguration.NegativePins));
-            }
-            */
-
             public void FlexorsInitializer()
             {
                 if (Server.OpenGloveServer.OpenGloveByDeviceName.ContainsKey(this.mmDeviceName))
@@ -455,7 +492,6 @@ namespace OpenGloveApp.Droid.Bluetooth
                         this.Write(mMessageGenerator.InitializeMotor(openGlove.Configuration.NegativePins));
                 }
             }
-
 
             private void FlexorCapture()
             {
