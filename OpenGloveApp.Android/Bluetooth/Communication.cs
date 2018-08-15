@@ -5,13 +5,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using Android.Bluetooth;
-using OpenGloveApp.AppConstants;
 using OpenGloveApp.CustomEventArgs;
 using OpenGloveApp.Droid.Bluetooth;
 using OpenGloveApp.Models;
 using OpenGloveApp.OpenGloveAPI;
-using OpenGloveApp.Pages;
-using OpenGloveApp.Utils;
+using OpenGloveApp.Server;
 using Xamarin.Forms;
 
 [assembly: Xamarin.Forms.Dependency(typeof(Communication))]
@@ -277,116 +275,11 @@ namespace OpenGloveApp.Droid.Bluetooth
             {
                 // Only accept message to Bluetooth Device managed for this ConnectedThread.
                 // TODO: Improve this with specific listeners for each connected thread(openglove devices connected).
-                if(e.DeviceName == mmDeviceName)
-                    SwitchOpenGloveActions(source, e);
+                if (e.DeviceName == mmDeviceName)
+                    Debug.WriteLine("Communication.Android: Delete This method");
             }
 
-            public void SwitchOpenGloveActions(object source, WebSocketEventArgs e)
-            {
-                
-                string message;
-                bool boolParsed;
-                int status;
 
-                try
-                {
-                    switch (e.What)
-                    {
-                        case (int)OpenGloveActions.StartCaptureData:
-                            break;
-
-                        case (int)OpenGloveActions.StopCaptureData:
-                            break;
-
-                        case (int)OpenGloveActions.AddFlexor:
-                            message = mMessageGenerator.addFlexor(e.Pin, e.Region);
-                            this.Write(message);
-                            break;
-
-                        case (int)OpenGloveActions.AddFlexors:
-                            if (NoNullAndEqualCount(e.Pins, e.Regions))
-                            {
-                                for (int i = 0; i < e.Pins.Count; i++)
-                                {
-                                    message = mMessageGenerator.addFlexor(e.Pins[i], e.Regions[i]);
-                                    this.Write(message);
-                                }
-                            }
-                            break;
-
-                        case (int)OpenGloveActions.RemoveFlexor:
-                            message = mMessageGenerator.removeFlexor(e.Region);
-                            this.Write(message);
-                            break;
-
-                        case (int)OpenGloveActions.RemoveFlexors:
-                            if (e.Regions != null)
-                            {
-                                for (int i = 0; i < e.Regions.Count; i++)
-                                {
-                                    message = mMessageGenerator.removeFlexor(e.Regions[i]);
-                                    this.Write(message);
-                                }
-                            }
-                            break;
-                        case (int)OpenGloveActions.CalibrateFlexors:
-                            message = mMessageGenerator.calibrateFlexors();
-                            this.Write(message);
-                            break;
-
-                        case (int)OpenGloveActions.ConfirmCalibration:
-                            message = mMessageGenerator.confirmCalibration();
-                            this.Write(message);
-                            break;
-
-                        case (int)OpenGloveActions.SetThreshold:
-                            message = mMessageGenerator.setThreshold(Int32.Parse(e.Value));
-                            this.Write(message);
-                            break;
-
-                        case (int)OpenGloveActions.ResetFlexors:
-                            message = mMessageGenerator.resetFlexors();
-                            this.Write(message);
-                            break;
-
-                        case (int)OpenGloveActions.StartIMU:
-                            message = mMessageGenerator.startIMU();
-                            this.Write(message);
-                            break;
-
-                        case (int)OpenGloveActions.SetIMUStatus:
-                            boolParsed = bool.Parse(e.Value);
-                            status = (boolParsed) ? 1 : 0;
-                            message = mMessageGenerator.setIMUStatus(status);
-                            this.Write(message);
-                            break;
-
-                        case (int)OpenGloveActions.SetRawData:
-                            boolParsed = bool.Parse(e.Value);
-                            status = (boolParsed) ? 1 : 0;
-                            message = mMessageGenerator.setRawData(status);
-                            this.Write(message);
-                            break;
-
-                        case (int)OpenGloveActions.SetLoopDelay:
-                            message = mMessageGenerator.setLoopDelay(Int32.Parse(e.Value));
-                            this.Write(message);
-                            break;
-
-                        case (int)OpenGloveActions.ActivateActuators:
-                            message = mMessageGenerator.ActivateMotor(e.Pins, e.Values);
-                            this.Write(message);
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
-                catch
-                {
-                    Debug.WriteLine("Communication ERROR: BAD FORMAT OR TYPE DATA in SwitchOpenGloveActions");
-                }
-            }
 
             //Handle event from UI thread
             public void OnBluetoothMessageSended(object source, BluetoothEventArgs e)
@@ -460,44 +353,13 @@ namespace OpenGloveApp.Droid.Bluetooth
                 }
             }
 
-            public void FlexorsInitializer()
-            {
-                if (Server.OpenGloveServer.OpenGloveByDeviceName.ContainsKey(this.mmDeviceName))
-                {
-                    OpenGlove openGlove = Server.OpenGloveServer.OpenGloveByDeviceName[this.mmDeviceName];
-                    foreach (var flexorMapping in  openGlove.Configuration.FlexorsByMapping)
-                    {
-                        this.Write(mMessageGenerator.addFlexor(openGlove.Configuration.FlexorPins[flexorMapping.Key], flexorMapping.Key));
-                    }
-                }
-            }
-
-            public void ActuatorsInitializer()
-            {
-                var actuatorsByMapping = Server.OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].Configuration.ActuatorsByMapping;
-                if (BooleanStatements.NoNullAndCountGreaterThanZero(actuatorsByMapping))
-                {
-                    List<int> positivePins = new List<int>();
-                    List<int> negativePins = new List<int>();
-
-                    foreach (Actuator actuator in actuatorsByMapping.Values)
-                    {
-                        positivePins.Add(actuator.PositivePin);
-                        negativePins.Add(actuator.NegativePin);
-                    }
-
-                    this.Write(mMessageGenerator.InitializeMotor(positivePins));
-                    this.Write(mMessageGenerator.InitializeMotor(negativePins));
-                }
-            }
-
             private void FlexorCapture()
             {
                 // Keep listening to the InputStream whit a StreamReader until an exception occurs
                 string line;
 
-                ActuatorsInitializer();
-                FlexorsInitializer();
+                OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].InitializeActuators();
+                OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].InitializeFlexors();
 
                 while (true)
                 {
@@ -515,8 +377,8 @@ namespace OpenGloveApp.Droid.Bluetooth
                         {
                             Debug.WriteLine($"BluetoothSocket is Disconnected, Trying Connect");
                             mmSocket.Connect();
-                            ActuatorsInitializer();
-                            FlexorsInitializer();
+                            OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].InitializeActuators();
+                            OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].InitializeFlexors();
                         }
                     }
                     catch (Java.IO.IOException e)

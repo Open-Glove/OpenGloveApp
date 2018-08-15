@@ -47,6 +47,42 @@ namespace OpenGloveApp.OpenGloveAPI
             }
         }
 
+        public void InitializeFlexors()
+        {
+            if(BooleanStatements.NoNullAndCountGreaterThanZero(this.Configuration.FlexorsByMapping))
+            {
+                foreach (var flexorByMapping in this.Configuration.FlexorsByMapping)
+                {
+                    this.LegacyOpenGlove.addFlexor(flexorByMapping.Value, flexorByMapping.Key);
+                }
+            }
+        }
+
+        public void AddActuator(int region, int positivePin, int negativePin)
+        {
+            this.Configuration.ActuatorsByMapping.Add(region, new Actuator()
+            {
+                PositivePin = positivePin, NegativePin = negativePin 
+            });
+            InitializeActuators();
+        }
+
+        public void AddActuators(List<int> regions, List<int> positivePins, List<int> negativePins)
+        {
+            if(BooleanStatements.NoNullAndEqualCount(regions, positivePins, negativePins))
+            {
+                for (int i = 0; i < regions.Count; i++ )
+                {
+                    this.Configuration.ActuatorsByMapping.Add(regions[i], new Actuator()
+                    {
+                        PositivePin = positivePins[i],
+                        NegativePin = negativePins[i]
+                    });
+                }
+                InitializeActuators();
+            }
+        }
+
         public void ActivateActuators(List<int> regions, List<string> intensities)
         {
             if(BooleanStatements.NoNullAndEqualCount(regions, intensities))
@@ -62,15 +98,14 @@ namespace OpenGloveApp.OpenGloveAPI
             }
         }
 
-        public void AddFlexor(int pin, int region)
+        public void AddFlexor(int region, int pin)
         {
             Configuration.FlexorPins.Add(pin);
             Configuration.FlexorsByMapping.Add(region, pin);
-            //this.addFlexor(pin, region);
             this.LegacyOpenGlove.addFlexor(pin, region);
         }
 
-        public void AddFlexors(List<int> pins, List<int> regions)
+        public void AddFlexors(List<int> regions, List<int> pins)
         {
             if (BooleanStatements.NoNullAndEqualCount(regions, pins))
             {
@@ -78,7 +113,6 @@ namespace OpenGloveApp.OpenGloveAPI
                 {
                     Configuration.FlexorPins.Add(pins[i]);
                     Configuration.FlexorsByMapping.Add(regions[i], pins[i]);
-                    //this.addFlexor(pins[i], regions[i]);
                     this.LegacyOpenGlove.addFlexor(pins[i], regions[i]);
                 }
             }
@@ -88,7 +122,6 @@ namespace OpenGloveApp.OpenGloveAPI
         {
             Configuration.FlexorPins.Remove(region);
             Configuration.FlexorsByMapping.Remove(region);
-            //this.removeFlexor(region);
             this.LegacyOpenGlove.removeFlexor(region);
         }
 
@@ -98,7 +131,6 @@ namespace OpenGloveApp.OpenGloveAPI
             {
                 Configuration.FlexorPins.Remove(region);
                 Configuration.FlexorsByMapping.Remove(region);
-                //this.removeFlexor(region);
                 this.LegacyOpenGlove.removeFlexor(region);
             }
         }
@@ -157,7 +189,7 @@ namespace OpenGloveApp.OpenGloveAPI
             this.LegacyOpenGlove.communication.OpenDeviceConnection(bluetoothDevice);
         }
 
-        // TODO quit this, only fir prototypes aplications
+        // TODO Delete this, only for first prototypes aplications
         public void OpenDeviceConnection(ContentPage contentPage, BluetoothDevices bluetoothDevice)
         {
             this.LegacyOpenGlove.communication.OpenDeviceConnection(contentPage, bluetoothDevice);

@@ -72,7 +72,7 @@ namespace OpenGloveApp.Server
             server.RestartAfterListenError = true;
         }
 
-        /* WebSocket format message:  ACTION;DEVICE;REGIONS;VALUES
+        /* WebSocket format message:  ACTION;DEVICE;REGIONS;VALUES;EXTRA_VALUES
          * sample:      Activate;OpenGloveIZQ;0,1,2,3;100,HIGH,LOW,255
          * Action:      one of this Actions in enum OpenGloveActions: StartCaptureData = 0, StopCaptureData = 1, ...
          * DeviceName:  Name of bluetooth device to apply the command
@@ -83,8 +83,8 @@ namespace OpenGloveApp.Server
         private void HandleMessage(IWebSocketConnection socket, string message)
         {
             Debug.WriteLine(message);
-            string[] words;             // ACTION;DEVICE;REGIONS;VALUES
-            int CountMessageSplit = 4;
+            string[] words;             // ACTION;DEVICE;REGIONS;VALUES;EXTRA_VALUES
+            int CountMessageSplit = 5;
 
             if (message != null)
             {
@@ -97,6 +97,7 @@ namespace OpenGloveApp.Server
                     string deviceName = null;
                     string regions = null;
                     string values = null; // intensities or pins
+                    string extraValues = null; // for add actuators ACTION;DEVICE;REGIONS;POSITIVE_PINS;NEGATIVE_PINS
 
                     if(count == CountMessageSplit)
                     {
@@ -104,8 +105,9 @@ namespace OpenGloveApp.Server
                         deviceName = words[1];
                         regions = words[2];
                         values = words[3];
+                        extraValues = words[4];
 
-                        SwitchOpenGloveActions(socket, message, action, deviceName, regions, values);
+                        SwitchOpenGloveActions(socket, message, action, deviceName, regions, values, extraValues);
                     }
                 }
                 catch
@@ -116,13 +118,17 @@ namespace OpenGloveApp.Server
 
         }
 
-        public void SwitchOpenGloveActions(IWebSocketConnection socket, string message, int what, string deviceName, string regions, string values)
+
+        // For add news actions on OpenGloveServer
+        public void SwitchOpenGloveActions(IWebSocketConnection socket, string message, int what, string deviceName, string regions, string values, string extraValues)
         {
             int Region = -1;
             List<int> Regions = null;
             List<string> Intensities = null;
             int Pin = -1;
+            int ExtraPin;
             List<int> Pins = null;
+            List<int> ExtraPins = null;
             string Value = null;
 
             try
@@ -140,13 +146,13 @@ namespace OpenGloveApp.Server
                     case (int)OpenGloveActions.AddFlexor:
                         Region = Int32.Parse(regions);
                         Pin = Int32.Parse(values);
-                        OpenGloveByDeviceName[deviceName].AddFlexor(Pin, Region);
+                        OpenGloveByDeviceName[deviceName].AddFlexor(Region, Pin);
                         break;
 
                     case (int)OpenGloveActions.AddFlexors:
                         Regions = regions.Split(',').Select(int.Parse).ToList();
                         Pins = values.Split(',').Select(int.Parse).ToList();
-                        OpenGloveByDeviceName[deviceName].AddFlexors(Pins, Regions);
+                        OpenGloveByDeviceName[deviceName].AddFlexors(Regions, Pins);
                         break;
 
                     case (int)OpenGloveActions.RemoveFlexor:
@@ -199,6 +205,20 @@ namespace OpenGloveApp.Server
                         Regions = regions.Split(',').Select(int.Parse).ToList();
                         Intensities = values.Split(',').ToList();
                         OpenGloveByDeviceName[deviceName].ActivateActuators(Regions, Intensities);
+                        break;
+
+                    case (int)OpenGloveActions.AddActuator:
+                        Region = regions.Split(',').Select(int.Parse).ToList()[0];
+                        Pin = values.Split(',').Select(int.Parse).ToList()[0];
+                        ExtraPin = Pin = values.Split(',').Select(int.Parse).ToList()[0];
+                        OpenGloveByDeviceName[deviceName].AddActuator(Region, Pin, ExtraPin);
+                        break;
+
+                    case (int)OpenGloveActions.AddActuators:
+                        Regions = regions.Split(',').Select(int.Parse).ToList();
+                        Pins = values.Split(',').Select(int.Parse).ToList();
+                        ExtraPins = extraValues.Split(',').Select(int.Parse).ToList();
+                        OpenGloveByDeviceName[deviceName].AddActuators(Regions, Pins, ExtraPins);
                         break;
 
                     default:

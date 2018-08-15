@@ -68,7 +68,11 @@ namespace OpenGloveApp.AppConstants
         Connect,
         Disconnect,
         ActivateActuators,
-        SaveGlove = 17
+        AddActuator,
+        AddActuators,
+        RemoveActuator,
+        RemoveActuators,
+        SaveGlove = 21
     }
 
     public enum PalmarRegion

@@ -26,6 +26,16 @@ namespace OpenGloveApp.Utils
             return false;
         }
 
+        public static bool NoNullAndEqualCount(List<int> list1, List<int> list2, List<int> list3)
+        {
+            if (list1 != null && list2 != null && list3 != null)
+            {
+                if (list1.Count > 0 && list2.Count > 0 && list3.Count > 0)
+                    return true;
+            }
+            return false;
+        }
+
         public static bool NoNullAndCountGreaterThanZero(Dictionary<int, int> dictionary)
         {
             if (dictionary != null)
@@ -41,5 +51,7 @@ namespace OpenGloveApp.Utils
                     return true;
             return false;
         }
+
+
     }
 }
