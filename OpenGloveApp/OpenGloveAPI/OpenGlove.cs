@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using OpenGloveApp.Models;
+using OpenGloveApp.Utils;
 using Xamarin.Forms;
 
 namespace OpenGloveApp.OpenGloveAPI
@@ -28,14 +29,37 @@ namespace OpenGloveApp.OpenGloveAPI
             this.Configuration = configuration;
         }
 
-        public bool NoNullAndEqualCount(List<int> list1, List<int> list2)
+        public void InitializeActuators()
         {
-            if (list1 != null & list2 != null)
+            if (BooleanStatements.NoNullAndCountGreaterThanZero(this.Configuration.ActuatorsByMapping))
             {
-                if (list1.Count == list2.Count)
-                    return true;
+                List<int> positivePins = new List<int>();
+                List<int> negativePins = new List<int>();
+
+                foreach (Actuator actuator in this.Configuration.ActuatorsByMapping.Values)
+                {
+                    positivePins.Add(actuator.PositivePin);
+                    negativePins.Add(actuator.NegativePin);
+                }
+
+                this.LegacyOpenGlove.InitializeMotor(positivePins);
+                this.LegacyOpenGlove.InitializeMotor(negativePins);
             }
-            return false;
+        }
+
+        public void ActivateActuators(List<int> regions, List<string> intensities)
+        {
+            if(BooleanStatements.NoNullAndEqualCount(regions, intensities))
+            {
+                List<int> positivePins = new List<int>();
+
+                foreach (int region in regions)
+                {
+                    positivePins.Add(this.Configuration.ActuatorsByMapping[region].PositivePin);
+                }
+
+                this.LegacyOpenGlove.ActivateMotor(positivePins, intensities);
+            }
         }
 
         public void AddFlexor(int pin, int region)
@@ -48,7 +72,7 @@ namespace OpenGloveApp.OpenGloveAPI
 
         public void AddFlexors(List<int> pins, List<int> regions)
         {
-            if (NoNullAndEqualCount(regions, pins))
+            if (BooleanStatements.NoNullAndEqualCount(regions, pins))
             {
                 for (int i = 0; i < regions.Count; i++)
                 {

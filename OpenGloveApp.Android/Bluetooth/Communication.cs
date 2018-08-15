@@ -11,6 +11,7 @@ using OpenGloveApp.Droid.Bluetooth;
 using OpenGloveApp.Models;
 using OpenGloveApp.OpenGloveAPI;
 using OpenGloveApp.Pages;
+using OpenGloveApp.Utils;
 using Xamarin.Forms;
 
 [assembly: Xamarin.Forms.Dependency(typeof(Communication))]
@@ -387,16 +388,6 @@ namespace OpenGloveApp.Droid.Bluetooth
                 }
             }
 
-            public bool NoNullAndEqualCount(List<int> list1, List<int> list2)
-            {
-                if(list1 != null & list2 != null)
-                {
-                    if(list1.Count == list2.Count)
-                        return true;
-                }
-                return false;
-            }
-
             //Handle event from UI thread
             public void OnBluetoothMessageSended(object source, BluetoothEventArgs e)
             {
@@ -474,22 +465,29 @@ namespace OpenGloveApp.Droid.Bluetooth
                 if (Server.OpenGloveServer.OpenGloveByDeviceName.ContainsKey(this.mmDeviceName))
                 {
                     OpenGlove openGlove = Server.OpenGloveServer.OpenGloveByDeviceName[this.mmDeviceName];
-                    foreach (var flexorByMapping in  openGlove.Configuration.FlexorsByMapping)
+                    foreach (var flexorMapping in  openGlove.Configuration.FlexorsByMapping)
                     {
-                        this.Write(mMessageGenerator.addFlexor(openGlove.Configuration.FlexorPins[flexorByMapping.Key], flexorByMapping.Key));
+                        this.Write(mMessageGenerator.addFlexor(openGlove.Configuration.FlexorPins[flexorMapping.Key], flexorMapping.Key));
                     }
                 }
             }
 
             public void ActuatorsInitializer()
             {
-                if (Server.OpenGloveServer.OpenGloveByDeviceName.ContainsKey(this.mmDeviceName))
+                var actuatorsByMapping = Server.OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].Configuration.ActuatorsByMapping;
+                if (BooleanStatements.NoNullAndCountGreaterThanZero(actuatorsByMapping))
                 {
-                    OpenGlove openGlove = Server.OpenGloveServer.OpenGloveByDeviceName[this.mmDeviceName];
-                    if (openGlove.Configuration.PositivePins != null)
-                        this.Write(mMessageGenerator.InitializeMotor(openGlove.Configuration.PositivePins));
-                    if (openGlove.Configuration.NegativePins!= null)
-                        this.Write(mMessageGenerator.InitializeMotor(openGlove.Configuration.NegativePins));
+                    List<int> positivePins = new List<int>();
+                    List<int> negativePins = new List<int>();
+
+                    foreach (Actuator actuator in actuatorsByMapping.Values)
+                    {
+                        positivePins.Add(actuator.PositivePin);
+                        negativePins.Add(actuator.NegativePin);
+                    }
+
+                    this.Write(mMessageGenerator.InitializeMotor(positivePins));
+                    this.Write(mMessageGenerator.InitializeMotor(negativePins));
                 }
             }
 

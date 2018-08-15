@@ -72,20 +72,18 @@ namespace OpenGloveApp.Server
             server.RestartAfterListenError = true;
         }
 
-        /* WebSocket format message:  Action;DeviceName;Intensity;Regions
-         * sample: Activate;OpenGloveIZQ;255;0,2,6,7,29
-         * Action:      one of this Actions : Activate, StartCaptureData, StopCaptureData,
-         * DeviceName:  Name of bluetooth device to send the command
-         * Intensity:   0 to 255
+        /* WebSocket format message:  ACTION;DEVICE;REGIONS;VALUES
+         * sample:      Activate;OpenGloveIZQ;0,1,2,3;100,HIGH,LOW,255
+         * Action:      one of this Actions in enum OpenGloveActions: StartCaptureData = 0, StopCaptureData = 1, ...
+         * DeviceName:  Name of bluetooth device to apply the command
          * Regions:     a list of regions to activate (int)
+         * Values (Intensities, Pins, single value): [Intensities: 0 to 255, HIGH and LOW] [Pins: number of the pin on board] [single value how: True, False, integer]
         */
         // Handle Message from WebSocket Client
         private void HandleMessage(IWebSocketConnection socket, string message)
         {
             Debug.WriteLine(message);
-            string[] words;
-            int MinCountMessageSplit = 2; // ACTION;DEVICE
-            int MaxCountMessageSplit = 4; // ACTION;DEVICE;REGIONS;VALUES
+            string[] words;             // ACTION;DEVICE;REGIONS;VALUES
             int CountMessageSplit = 4;
 
             if (message != null)
@@ -105,7 +103,7 @@ namespace OpenGloveApp.Server
                         action = Int32.Parse(words[0]);
                         deviceName = words[1];
                         regions = words[2];
-                        values = words[3]; // intensities or pins
+                        values = words[3];
 
                         SwitchOpenGloveActions(socket, message, action, deviceName, regions, values);
                     }
@@ -122,11 +120,10 @@ namespace OpenGloveApp.Server
         {
             int Region = -1;
             List<int> Regions = null;
-            List<int> Intensities = null;
+            List<string> Intensities = null;
             int Pin = -1;
             List<int> Pins = null;
             string Value = null;
-            List<string> Values = null;
 
             try
             {
@@ -199,13 +196,11 @@ namespace OpenGloveApp.Server
                         break;
 
                     case (int)OpenGloveActions.ActivateActuators:
-                        // Transform string to list of regions and intensities
-                        //List<int> regions = words[2].Split(',').Select(int.Parse).ToList();
-                        //List<string> instensities = words[3].Split(',').ToList();
-                        //List<Actuator> actuators = 
-
-                        //OnWebSocketDataReceived(OpenGloveActions.ActivateActuators, words[1], );
+                        Regions = regions.Split(',').Select(int.Parse).ToList();
+                        Intensities = values.Split(',').ToList();
+                        OpenGloveByDeviceName[deviceName].ActivateActuators(Regions, Intensities);
                         break;
+
                     default:
                         socket.Send("You said: " + message); // test echo message
                         break;

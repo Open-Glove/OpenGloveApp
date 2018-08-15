@@ -31,14 +31,5 @@ namespace OpenGloveApp.Models
 
             //this.FlexorsByMapping.Add((int) AppConstants.FlexorsRegion.ThumbInterphalangealJoint, FlexorPins[0]);
         }
-
-        public List<int> GetPinsOfActuators()
-        {
-            foreach(Actuator actuator in ActuatorsList)
-            {
-                
-            }
-            return null;
-        }
     }
 }
