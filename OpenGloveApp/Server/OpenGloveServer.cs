@@ -5,14 +5,13 @@ using System.Linq;
 using Fleck;
 using OpenGloveApp.AppConstants;
 using OpenGloveApp.CustomEventArgs;
+using OpenGloveApp.Models;
 using OpenGloveApp.OpenGloveAPI;
 
 namespace OpenGloveApp.Server
 {
     public class OpenGloveServer: Server
     {
-        public static event EventHandler<WebSocketEventArgs> WebSocketMessageReceived;
-
         private string url;
         private WebSocketServer server; // sample "ws://127.0.0.1:7070"
         private List<IWebSocketConnection> allSockets = new List<IWebSocketConnection>();
@@ -135,12 +134,87 @@ namespace OpenGloveApp.Server
             {
                 switch (what)
                 {
-                    case (int)OpenGloveActions.StartCaptureData:
+                    case (int)OpenGloveActions.AddOpenGloveDevice:
+                        AddOpenGloveDevice(deviceName);
+                        break;
+
+                    case (int)OpenGloveActions.RemoveOpenGloveDevice:
+                        RemoveOpenGloveDevice(deviceName);
+                        break;
+
+                    case (int)OpenGloveActions.Connect:
+                        try
+                        {
+                            if (OpenGloveByDeviceName.ContainsKey(deviceName))
+                                OpenGloveByDeviceName[deviceName].OpenDeviceConnection();
+                            else
+                                socket.Send($"[OpenGloveServer] Connect Error: add this new OpenGloveDevice first");
+                        }
+                        catch
+                        {
+                            socket.Send($"[OpenGloveServer] Connenct Error: turn On Bluetooth or dont exist bounded device name");
+                        }
+
+                        break;
+
+                    case (int)OpenGloveActions.Disconnect:
+                        try
+                        {
+                            if (OpenGloveByDeviceName.ContainsKey(deviceName))
+                            {
+                                OpenGloveByDeviceName[deviceName].TurnOffActuators(); //TODO await turn off before CloseConnection
+                                OpenGloveByDeviceName[deviceName].CloseDeviceConnection();
+                            }
+                            else
+                                socket.Send($"[OpenGloveServer] Disconnect Error: add this new OpenGloveDevice first");
+                        }
+                        catch
+                        {
+                            socket.Send($"[OpenGloveServer] Disconnect Error: Turn On Bluetooth or dont exist bounded device name");
+                        }
+
+                        break;
+
+                    case (int)OpenGloveActions.StartCaptureDataFromServer:
                         webSocketByDeviceName.Add(deviceName, socket);
                         break;
 
-                    case (int)OpenGloveActions.StopCaptureData:
+                    case (int)OpenGloveActions.StopCaptureDataFromServer:
                         webSocketByDeviceName.Remove(deviceName);
+                        break;
+
+                    case (int)OpenGloveActions.AddActuator:
+                        Region = regions.Split(',').Select(int.Parse).ToList()[0];
+                        Pin = values.Split(',').Select(int.Parse).ToList()[0];
+                        ExtraPin = Pin = values.Split(',').Select(int.Parse).ToList()[0];
+                        OpenGloveByDeviceName[deviceName].AddActuator(Region, Pin, ExtraPin);
+                        break;
+
+                    case (int)OpenGloveActions.AddActuators:
+                        Regions = regions.Split(',').Select(int.Parse).ToList();
+                        Pins = values.Split(',').Select(int.Parse).ToList();
+                        ExtraPins = extraValues.Split(',').Select(int.Parse).ToList();
+                        OpenGloveByDeviceName[deviceName].AddActuators(Regions, Pins, ExtraPins);
+                        break;
+
+                    case (int)OpenGloveActions.RemoveActuator:
+                        Region = regions.Split(',').Select(int.Parse).ToList()[0];
+                        OpenGloveByDeviceName[deviceName].RemoveActuator(Region);
+                        break;
+
+                    case (int)OpenGloveActions.RemoveActuators:
+                        Regions = regions.Split(',').Select(int.Parse).ToList();
+                        OpenGloveByDeviceName[deviceName].RemoveActuators(Regions);
+                        break;
+
+                    case (int)OpenGloveActions.ActivateActuators:
+                        Regions = regions.Split(',').Select(int.Parse).ToList();
+                        Intensities = values.Split(',').ToList();
+                        OpenGloveByDeviceName[deviceName].ActivateActuators(Regions, Intensities);
+                        break;
+
+                    case (int)OpenGloveActions.ResetActuators:
+                        OpenGloveByDeviceName[deviceName].ResetActuators();
                         break;
 
                     case (int)OpenGloveActions.AddFlexor:
@@ -196,29 +270,17 @@ namespace OpenGloveApp.Server
                         OpenGloveByDeviceName[deviceName].SetRawData(bool.Parse(Value));
                         break;
 
+                    case (int)OpenGloveActions.CalibrateIMU:
+                        socket.Send("[OpenGloveServer] CalibrateIMU: Not Implemented");
+                        break;
+
                     case (int)OpenGloveActions.SetLoopDelay:
                         Value = values.Split(',')[0];
                         OpenGloveByDeviceName[deviceName].SetLoopDelay(Int32.Parse(Value));
                         break;
 
-                    case (int)OpenGloveActions.ActivateActuators:
-                        Regions = regions.Split(',').Select(int.Parse).ToList();
-                        Intensities = values.Split(',').ToList();
-                        OpenGloveByDeviceName[deviceName].ActivateActuators(Regions, Intensities);
-                        break;
-
-                    case (int)OpenGloveActions.AddActuator:
-                        Region = regions.Split(',').Select(int.Parse).ToList()[0];
-                        Pin = values.Split(',').Select(int.Parse).ToList()[0];
-                        ExtraPin = Pin = values.Split(',').Select(int.Parse).ToList()[0];
-                        OpenGloveByDeviceName[deviceName].AddActuator(Region, Pin, ExtraPin);
-                        break;
-
-                    case (int)OpenGloveActions.AddActuators:
-                        Regions = regions.Split(',').Select(int.Parse).ToList();
-                        Pins = values.Split(',').Select(int.Parse).ToList();
-                        ExtraPins = extraValues.Split(',').Select(int.Parse).ToList();
-                        OpenGloveByDeviceName[deviceName].AddActuators(Regions, Pins, ExtraPins);
+                    case (int)OpenGloveActions.SaveOpenGloveDevice:
+                        socket.Send("[OpenGloveServer] SaveGloveDevice: Not Implemented");
                         break;
 
                     default:
@@ -232,116 +294,6 @@ namespace OpenGloveApp.Server
             }
         }
 
-        // Method for raise event to subcribers (aka. Connected Thread on Communication implementation iOS/Android of OpenGlove devices)
-        protected virtual void OnWebSocketMessageReceived(IWebSocketConnection socket, string message, int what, string deviceName, string regions, string values)
-        {
-            int Region = -1;
-            List<int> Regions = null;
-            List<int> Intensities = null;
-            int Pin = -1;
-            List<int> Pins = null;
-            string Value = null;
-            List<string> Values = null;
-
-            try {
-                switch (what)
-                {
-                    case (int)OpenGloveActions.StartCaptureData:
-                        webSocketByDeviceName.Add(deviceName, socket);
-                        break;
-
-                    case (int)OpenGloveActions.StopCaptureData:
-                        webSocketByDeviceName.Remove(deviceName);
-                        break;
-
-                    case (int)OpenGloveActions.AddFlexor:
-                        Region = Int32.Parse(regions);
-                        Pin = Int32.Parse(values);
-                        OpenGloveByDeviceName[deviceName].AddFlexor(Pin, Region);
-                        break;
-
-                    case (int)OpenGloveActions.AddFlexors:
-                        Regions = regions.Split(',').Select(int.Parse).ToList();
-                        Pins = values.Split(',').Select(int.Parse).ToList();
-                        OpenGloveByDeviceName[deviceName].AddFlexors(Pins, Regions);
-                        break;
-
-                    case (int)OpenGloveActions.RemoveFlexor:
-                        Region = Int32.Parse(regions);
-                        OpenGloveByDeviceName[deviceName].RemoveFlexor(Region);
-                        break;
-
-                    case (int)OpenGloveActions.RemoveFlexors:
-                        Regions = regions.Split(',').Select(int.Parse).ToList();
-                        OpenGloveByDeviceName[deviceName].RemoveFlexors(Regions);
-                        break;
-
-                    case (int)OpenGloveActions.CalibrateFlexors:
-                        OpenGloveByDeviceName[deviceName].CalibrateFlexors();
-                        break;
-
-                    case (int)OpenGloveActions.ConfirmCalibration:
-                        OpenGloveByDeviceName[deviceName].ConfirmCalibration();
-                        break;
-
-                    case (int)OpenGloveActions.SetThreshold:
-                        Value = values.Split(',')[0];
-                        OpenGloveByDeviceName[deviceName].SetThreshold(Int32.Parse(Value));
-                        break;
-
-                    case (int)OpenGloveActions.ResetFlexors:
-                        OpenGloveByDeviceName[deviceName].ResetFlexors();
-                        break;
-
-                    case (int)OpenGloveActions.StartIMU:
-                        OpenGloveByDeviceName[deviceName].StartIMU();
-                        break;
-
-                    case (int)OpenGloveActions.SetIMUStatus:
-                        Value = values.Split(',')[0];
-                        OpenGloveByDeviceName[deviceName].SetIMUStatus(bool.Parse(Value));
-                        break;
-
-                    case (int)OpenGloveActions.SetRawData:
-                        Value = values.Split(',')[0];
-                        OpenGloveByDeviceName[deviceName].SetRawData(bool.Parse(Value));
-                        break;
-
-                    case (int)OpenGloveActions.SetLoopDelay:
-                        Value = values.Split(',')[0];
-                        OpenGloveByDeviceName[deviceName].SetLoopDelay(Int32.Parse(Value));
-                        break;
-
-                    case (int)OpenGloveActions.ActivateActuators:
-                        // Transform string to list of regions and intensities
-                        //List<int> regions = words[2].Split(',').Select(int.Parse).ToList();
-                        //List<string> instensities = words[3].Split(',').ToList();
-                        //List<Actuator> actuators = 
-
-                        //OnWebSocketDataReceived(OpenGloveActions.ActivateActuators, words[1], );
-                        break;
-                    default:
-                        socket.Send("You said: " + message); // test echo message
-                        break;
-                }
-            } 
-            catch 
-            {
-                Debug.WriteLine("WebSocketServer ERROR: BAD FORMAT OR TYPE DATA in OnWebSocketMessageReceived");
-            }
-
-        }
-
-        public bool NoNullAndEqualCount(List<int> list1, List<int> list2)
-        {
-            if (list1 != null & list2 != null)
-            {
-                if (list1.Count == list2.Count)
-                    return true;
-            }
-            return false;
-        }
-
         // Method for subcribe to messages from OpenGlove Devices
         public static void OnBluetoothMessage(object source, BluetoothEventArgs e)
         {
@@ -352,10 +304,31 @@ namespace OpenGloveApp.Server
         {
             if (e.Message != null)
             {
-                //Debug.WriteLine($" [{e.DeviceName}] OpenGloveServer.OnBluetoothMessage: {e.Message}");
                 if (webSocketByDeviceName.ContainsKey(e.DeviceName))
                     webSocketByDeviceName[e.DeviceName].Send(e.Message);
             }
+        }
+
+        public bool AddOpenGloveDevice(string deviceName)
+        {
+            if (!OpenGloveByDeviceName.ContainsKey(deviceName))
+            {
+                OpenGlove openGlove = new OpenGlove(deviceName);
+                OpenGloveByDeviceName.Add(openGlove.BluetoothDeviceName, openGlove);
+                return true;
+            }
+            return false;
+        }
+
+        public bool RemoveOpenGloveDevice(string deviceName)
+        {
+            if (OpenGloveByDeviceName.ContainsKey(deviceName))
+            {
+                OpenGloveByDeviceName[deviceName].CloseDeviceConnection(); //TODO await this mehod for close connection
+                OpenGloveByDeviceName.Remove(deviceName);
+                return true;
+            }
+            return false;
         }
 
     }

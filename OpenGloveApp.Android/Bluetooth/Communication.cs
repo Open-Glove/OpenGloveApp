@@ -23,7 +23,8 @@ namespace OpenGloveApp.Droid.Bluetooth
         private BluetoothDevice mDevice;
         private List<BluetoothDevices> mBoundedDevicesModel;
         private Hashtable mBoundedDevices = new Hashtable();
-        private static ConnectedThread mBluetoothManagement;
+        private Dictionary<string, BluetoothDevice> mBoundedDeviceByDeviceName = new Dictionary<string, BluetoothDevice>();
+        private static ConnectedThread mBluetoothManagementThread;
 
         public Communication()
         {
@@ -50,19 +51,31 @@ namespace OpenGloveApp.Droid.Bluetooth
             aConnectedObject = null;
         }
 
-        public void OpenDeviceConnection(BluetoothDevices bluetoothDevice)
+        public void OpenDeviceConnection(string bluetoothDeviceName)
         {
             if (mBluetoothAdapter != null)
             {
                 if (mBluetoothAdapter.IsEnabled)
                 {
-                    mDevice = mBoundedDevices[bluetoothDevice.Name] as BluetoothDevice;
-                    ConnectThread connectThread = new ConnectThread(mDevice);
-                    connectThread.Start();
+                    UpdatePairedDevices();
+
+                    if(mBoundedDeviceByDeviceName.ContainsKey(bluetoothDeviceName))
+                    {
+                        mDevice = mBoundedDeviceByDeviceName[bluetoothDeviceName];
+                        ConnectThread connectThread = new ConnectThread(mDevice);
+                        connectThread.Start();
+                    }
                 }
             }
         }
 
+        public void CloseDeviceConnection()
+        {
+            mBluetoothManagementThread.Close();
+        }
+
+
+        //TODO delete this method, is deprecated
         public void OpenDeviceConnection(ContentPage contentPage, BluetoothDevices bluetoothDevice)
         {
             if (mBluetoothAdapter != null)
@@ -76,13 +89,12 @@ namespace OpenGloveApp.Droid.Bluetooth
             }
         }
 
-        public List<BluetoothDevices> GetAllPairedDevices()
+        public void UpdatePairedDevices()
         {
-            if (mBluetoothAdapter == null) return null;
+            if (mBluetoothAdapter == null) return;
 
-            mBoundedDevices.Clear();
+            mBoundedDeviceByDeviceName.Clear();
             mBoundedDevicesModel.Clear();
-
 
             var devices = mBluetoothAdapter.BondedDevices;
 
@@ -90,7 +102,7 @@ namespace OpenGloveApp.Droid.Bluetooth
             {
                 foreach (BluetoothDevice device in devices)
                 {
-                    mBoundedDevices.Add(device.Name, device);
+                    mBoundedDeviceByDeviceName.Add(device.Name, device);
                     mBoundedDevicesModel.Add(new BluetoothDevices
                     {
                         Name = device.Name,
@@ -98,6 +110,11 @@ namespace OpenGloveApp.Droid.Bluetooth
                     });
                 }
             }
+        }
+
+        public List<BluetoothDevices> GetAllPairedDevices()
+        {
+            UpdatePairedDevices();
             return mBoundedDevicesModel;
         }
 
@@ -113,12 +130,12 @@ namespace OpenGloveApp.Droid.Bluetooth
 
         public void Write(string message)
         {
-            mBluetoothManagement.Write(message);
+            mBluetoothManagementThread.Write(message);
         }
 
         public string ReadLine()
         {
-            return mBluetoothManagement.ReadLine();
+            return mBluetoothManagementThread.ReadLine();
         }
 
         public void ClosePort()
@@ -190,10 +207,10 @@ namespace OpenGloveApp.Droid.Bluetooth
                     // Do work to manage the connection (in a separate thread)
                     // TODO manageConnectedSocket(mmSocket);
                     if (mmContentPage != null)
-                        mBluetoothManagement = new ConnectedThread(mmContentPage, mmSocket);
+                        mBluetoothManagementThread = new ConnectedThread(mmContentPage, mmSocket);
                     else
-                        mBluetoothManagement = new ConnectedThread(mmDevice, mmSocket);
-                    mBluetoothManagement.Start();
+                        mBluetoothManagementThread = new ConnectedThread(mmDevice, mmSocket);
+                    mBluetoothManagementThread.Start();
                 }
                 catch (Java.IO.IOException e)
                 {
@@ -217,6 +234,7 @@ namespace OpenGloveApp.Droid.Bluetooth
             private Stream mmOutputStream;
             private MessageGenerator mMessageGenerator = new MessageGenerator();
             private List<int> mFlexorPins = new List<int> { 17 }; //TODO get this from OpenGloveApp
+            private bool TurnON = true;
             public int mEvaluation = 0; //OpenGloveAppPage.FLEXOR_EVALUATION; //OpenGloveAppPage.MOTOR_EVALUATION;
 
             public ConnectedThread(BluetoothDevice device, BluetoothSocket bluetoothSocket)
@@ -280,7 +298,7 @@ namespace OpenGloveApp.Droid.Bluetooth
             }
 
 
-
+            //TODO Delete This
             //Handle event from UI thread
             public void OnBluetoothMessageSended(object source, BluetoothEventArgs e)
             {
@@ -348,12 +366,12 @@ namespace OpenGloveApp.Droid.Bluetooth
                         MotorTest(1000, 5, "latency-test", "motor5XamarinNexus.csv");
                         break;
                     default:
-                        FlexorCapture();
+                        MainRutine();
                         break;
                 }
             }
 
-            private void FlexorCapture()
+            private void MainRutine()
             {
                 // Keep listening to the InputStream whit a StreamReader until an exception occurs
                 string line;
@@ -361,11 +379,10 @@ namespace OpenGloveApp.Droid.Bluetooth
                 OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].InitializeActuators();
                 OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].InitializeFlexors();
 
-                while (true)
+                while (TurnON)
                 {
                     try
                     {
-                        //line = AnalogRead(mFlexorPins[0]);
                         line = ReadLine();
 
                         if (line != null)
@@ -545,6 +562,7 @@ namespace OpenGloveApp.Droid.Bluetooth
                 try
                 {
                     mmSocket.Close();
+                    TurnON = false;
                 }
                 catch (Java.IO.IOException e)
                 {

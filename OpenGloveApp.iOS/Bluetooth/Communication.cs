@@ -14,6 +14,11 @@ namespace OpenGloveApp.iOS.Bluetooth
         {
         }
 
+        public void CloseDeviceConnection()
+        {
+            throw new NotImplementedException();
+        }
+
         public void ClosePort()
         {
             throw new NotImplementedException();
@@ -34,7 +39,7 @@ namespace OpenGloveApp.iOS.Bluetooth
             throw new NotImplementedException();
         }
 
-        public void OpenDeviceConnection(BluetoothDevices bluetoothDevice)
+        public void OpenDeviceConnection(string bluetoothDeviceName)
         {
             throw new NotImplementedException();
         }

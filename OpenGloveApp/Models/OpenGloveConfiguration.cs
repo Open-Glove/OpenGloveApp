@@ -13,8 +13,8 @@ namespace OpenGloveApp.Models
         public List<string> ValuesON;  //values: HIGH, LOW, 0-255
         public List<string> ValuesOFF; //values: HIGH, LOW, 0-255
         public List<Actuator> ActuatorsList;
-        public Dictionary<int, Actuator> ActuatorsByMapping = new Dictionary<int, Actuator>();
-        public Dictionary<int, int> FlexorsByMapping = new Dictionary<int, int>();
+        public Dictionary<int, Actuator> ActuatorsByRegion = new Dictionary<int, Actuator>();
+        public Dictionary<int, int> FlexorsByRegion = new Dictionary<int, int>();
 
         public OpenGloveConfiguration()
         {

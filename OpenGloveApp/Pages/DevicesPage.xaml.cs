@@ -68,7 +68,7 @@ namespace OpenGloveApp.Pages
                 if(!OpenGloveServer.OpenGloveByDeviceName.ContainsKey(device.Name))
                     OpenGloveServer.OpenGloveByDeviceName.Add(device.Name, openGlove);
                 
-                OpenGloveServer.OpenGloveByDeviceName[device.Name].OpenDeviceConnection(device); //Blocking call
+                OpenGloveServer.OpenGloveByDeviceName[device.Name].OpenDeviceConnection(); //Blocking call
             }
         }
 

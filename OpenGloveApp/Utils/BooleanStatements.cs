@@ -30,7 +30,7 @@ namespace OpenGloveApp.Utils
         {
             if (list1 != null && list2 != null && list3 != null)
             {
-                if (list1.Count > 0 && list2.Count > 0 && list3.Count > 0)
+                if (list1.Count == list2.Count && list2.Count  == list3.Count)
                     return true;
             }
             return false;
