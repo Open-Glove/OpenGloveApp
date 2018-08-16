@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using Fleck;
 using OpenGloveApp.AppConstants;
-using OpenGloveApp.CustomEventArgs;
-using OpenGloveApp.Models;
 using OpenGloveApp.OpenGloveAPI;
 
 namespace OpenGloveApp.Server
@@ -142,37 +140,16 @@ namespace OpenGloveApp.Server
                         RemoveOpenGloveDevice(deviceName);
                         break;
 
-                    case (int)OpenGloveActions.Connect:
-                        try
-                        {
-                            if (OpenGloveByDeviceName.ContainsKey(deviceName))
-                                OpenGloveByDeviceName[deviceName].OpenDeviceConnection();
-                            else
-                                socket.Send($"[OpenGloveServer] Connect Error: add this new OpenGloveDevice first");
-                        }
-                        catch
-                        {
-                            socket.Send($"[OpenGloveServer] Connenct Error: turn On Bluetooth or dont exist bounded device name");
-                        }
+                    case (int)OpenGloveActions.SaveOpenGloveDevice:
+                        socket.Send($"[OpenGloveServer] SaveOpenGloveDevice: not implemented");
+                        break;
 
+                    case (int)OpenGloveActions.Connect:
+                        TryConnect(socket, deviceName);
                         break;
 
                     case (int)OpenGloveActions.Disconnect:
-                        try
-                        {
-                            if (OpenGloveByDeviceName.ContainsKey(deviceName))
-                            {
-                                OpenGloveByDeviceName[deviceName].TurnOffActuators(); //TODO await turn off before CloseConnection
-                                OpenGloveByDeviceName[deviceName].CloseDeviceConnection();
-                            }
-                            else
-                                socket.Send($"[OpenGloveServer] Disconnect Error: add this new OpenGloveDevice first");
-                        }
-                        catch
-                        {
-                            socket.Send($"[OpenGloveServer] Disconnect Error: Turn On Bluetooth or dont exist bounded device name");
-                        }
-
+                        TryDisconnect(socket, deviceName);
                         break;
 
                     case (int)OpenGloveActions.StartCaptureDataFromServer:
@@ -279,10 +256,6 @@ namespace OpenGloveApp.Server
                         OpenGloveByDeviceName[deviceName].SetLoopDelay(Int32.Parse(Value));
                         break;
 
-                    case (int)OpenGloveActions.SaveOpenGloveDevice:
-                        socket.Send("[OpenGloveServer] SaveGloveDevice: Not Implemented");
-                        break;
-
                     default:
                         socket.Send("You said: " + message); // test echo message
                         break;
@@ -329,6 +302,49 @@ namespace OpenGloveApp.Server
                 return true;
             }
             return false;
+        }
+
+        public bool TryConnect(IWebSocketConnection socket, string deviceName)
+        {
+            try
+            {
+                if (OpenGloveByDeviceName.ContainsKey(deviceName))
+                {
+                    OpenGloveByDeviceName[deviceName].OpenDeviceConnection();
+                    return true;
+                }
+                else
+                    socket.Send($"[OpenGloveServer] Connect Error: add this new OpenGloveDevice first");
+                return false;
+            }
+            catch
+            {
+                socket.Send($"[OpenGloveServer] Connect Error: turn On Bluetooth or dont exist bounded device name");
+                return false;
+            }
+        }
+
+        public bool TryDisconnect( IWebSocketConnection socket, string deviceName)
+        {
+            try
+            {
+                if (OpenGloveByDeviceName.ContainsKey(deviceName))
+                {
+                    OpenGloveByDeviceName[deviceName].TurnOffActuators(); //TODO await turn off before CloseConnection
+                    OpenGloveByDeviceName[deviceName].CloseDeviceConnection();
+                    return true;
+                }
+                else
+                {
+                    socket.Send($"[OpenGloveServer] Disconnect Error: add this new OpenGloveDevice first");
+                    return false;
+                }
+            }
+            catch
+            {
+                socket.Send($"[OpenGloveServer] Disconnect Error: Turn On Bluetooth or dont exist bounded device name");
+                return false;
+            }
         }
 
     }

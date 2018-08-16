@@ -62,7 +62,7 @@ namespace OpenGloveApp.Pages
             if (connect)
             {
                 //TODO call the config asociate to this OpenGlove device if exist in this Page
-                OpenGloveConfiguration openGloveConfiguration = new OpenGloveConfiguration(); //default config
+                OpenGloveConfiguration openGloveConfiguration = new OpenGloveConfiguration(); //load config
                 OpenGlove openGlove = new OpenGlove(device.Name, openGloveConfiguration);
 
                 if(!OpenGloveServer.OpenGloveByDeviceName.ContainsKey(device.Name))
