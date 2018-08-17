@@ -267,5 +267,14 @@ namespace OpenGloveApp.OpenGloveAPI
             communication.Write(message);
         }
 
+        /// <summary>
+        ///  
+        /// </summary>
+        /// <param name="value"></param>
+        public void setChoosingData(int value)
+        {
+            string message = messageGenerator.setChoosingData(value);
+            communication.Write(message);
+        }
     }
 }

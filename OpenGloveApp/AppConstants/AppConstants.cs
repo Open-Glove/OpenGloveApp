@@ -76,9 +76,10 @@ namespace OpenGloveApp.AppConstants
         StartIMU = 21,
         SetIMUStatus,
         SetRawData,
+        SetIMUChoosingData,
         CalibrateIMU,
 
-        SetLoopDelay = 25,
+        SetLoopDelay = 26,
     }
 
     public enum PalmarRegion

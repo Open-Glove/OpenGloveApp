@@ -227,11 +227,6 @@ namespace OpenGloveApp.OpenGloveAPI
             Configuration.ActuatorsByRegion.Clear();      //Clear mapping
         }
 
-        public void SetLoopDelay(int value)
-        {
-            this.LegacyOpenGlove.setLoopDelay(value);
-        }
-
         public void StartIMU()
         {
             this.LegacyOpenGlove.startIMU();
@@ -247,6 +242,16 @@ namespace OpenGloveApp.OpenGloveAPI
         {
             int integerStatus = (status) ? 1 : 0;
             this.LegacyOpenGlove.setRawData(integerStatus);
+        }
+
+        public void SetIMUChoosingData(int value)
+        {
+            this.LegacyOpenGlove.setChoosingData(value);
+        }
+
+        public void SetLoopDelay(int value)
+        {
+            this.LegacyOpenGlove.setLoopDelay(value);
         }
 
         public List<BluetoothDevices> GetAllPairedDevices()

@@ -83,6 +83,10 @@ namespace OpenGloveApp.OpenGloveAPI
         /// <summary>
         /// Description
         /// </summary>
+        private string setChoosingDataFunctionNumber = "23";
+        /// <summary>
+        /// Description
+        /// </summary>
         private string setLoopDelayNumber = "0";
 
 
@@ -493,6 +497,16 @@ namespace OpenGloveApp.OpenGloveAPI
         public string setLoopDelay(int value)
         {
             string message = setLoopDelayNumber + separator + value + terminal;
+            return message;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>set loop delay Arduino</returns>
+        public string setChoosingData(int value)
+        {
+            string message = setChoosingDataFunctionNumber + separator + value + terminal;
             return message;
         }
 

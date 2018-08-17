@@ -127,6 +127,7 @@ namespace OpenGloveApp.Server
             List<int> Pins = null;
             List<int> ExtraPins = null;
             string Value = null;
+            int IntegerValue = -1;
 
             try
             {
@@ -245,6 +246,11 @@ namespace OpenGloveApp.Server
                     case (int)OpenGloveActions.SetRawData:
                         Value = values.Split(',')[0];
                         OpenGloveByDeviceName[deviceName].SetRawData(bool.Parse(Value));
+                        break;
+
+                    case (int)OpenGloveActions.SetIMUChoosingData:
+                        IntegerValue = values.Split(',').Select(int.Parse).ToList()[0];
+                        OpenGloveByDeviceName[deviceName].SetIMUChoosingData(IntegerValue);
                         break;
 
                     case (int)OpenGloveActions.CalibrateIMU:
