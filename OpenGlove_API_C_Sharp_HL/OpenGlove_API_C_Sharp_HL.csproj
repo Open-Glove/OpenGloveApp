@@ -11,4 +11,7 @@
   <ItemGroup>
     <Folder Include="OpenGloveAPI_HL\" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="DataReceiver.cs" />
+  </ItemGroup>
 </Project>

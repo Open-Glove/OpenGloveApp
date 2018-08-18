@@ -26,33 +26,6 @@ namespace OpenGloveApp.OpenGloveAPI
             this.Configuration = configuration;
         }
 
-        public void TurnOffActuators()
-        {
-            List<int> regions = new List<int>();
-            List<string> intensities = new List<string>();
-
-            foreach (var entry in Configuration.ActuatorsByRegion)
-            {
-                regions.Add(entry.Key);
-                intensities.Add("0"); // 0 or LOW for turn off
-            }
-
-            this.ActivateActuators(regions, intensities); //Turn Off Actuators
-        }
-
-        public void TurnOnFlexors()
-        {
-            InitializeFlexors();
-        }
-
-        public void TurnOffFlexors()
-        {
-            foreach (var entry in Configuration.FlexorsByRegion)
-            {
-                this.LegacyOpenGlove.removeFlexor(entry.Key);
-            }
-        }
-
         public void InitializeActuators()
         {
             if (BooleanStatements.NoNullAndCountGreaterThanZero(this.Configuration.ActuatorsByRegion))
@@ -151,6 +124,50 @@ namespace OpenGloveApp.OpenGloveAPI
             }
         }
 
+        public void TurnOnActuators()
+        {
+            List<int> regions = new List<int>();
+            List<string> intensities = new List<string>();
+
+            foreach (var entry in Configuration.ActuatorsByRegion)
+            {
+                regions.Add(entry.Key);
+                intensities.Add("255"); // 255 or HIGH for turn On on MAX
+            }
+
+            this.ActivateActuators(regions, intensities); //Turn ON Actuators
+        }
+
+        public void TurnOffActuators()
+        {
+            List<int> regions = new List<int>();
+            List<string> intensities = new List<string>();
+
+            foreach (var entry in Configuration.ActuatorsByRegion)
+            {
+                regions.Add(entry.Key);
+                intensities.Add("0"); // 0 or LOW for turn off
+            }
+
+            this.ActivateActuators(regions, intensities); //Turn Off Actuators
+        }
+
+        public void ResetActuators()
+        {
+            List<int> regions = new List<int>();
+            List<string> intensities = new List<string>();
+
+            foreach (var entry in Configuration.ActuatorsByRegion)
+            {
+                regions.Add(entry.Key);
+                intensities.Add("0"); // 0 or LOW for turn off
+            }
+
+            this.ActivateActuators(regions, intensities); //Turn Off Actuators
+
+            Configuration.ActuatorsByRegion.Clear();      //Clear mapping
+        }
+
         public void AddFlexor(int region, int pin)
         {
             if (!Configuration.FlexorsByRegion.ContainsKey(region))
@@ -205,26 +222,23 @@ namespace OpenGloveApp.OpenGloveAPI
             this.LegacyOpenGlove.setThreshold(value);
         }
 
+        public void TurnOnFlexors()
+        {
+            InitializeFlexors();
+        }
+
+        public void TurnOffFlexors()
+        {
+            foreach (var entry in Configuration.FlexorsByRegion)
+            {
+                this.LegacyOpenGlove.removeFlexor(entry.Key);
+            }
+        }
+
         public void ResetFlexors()
         {
             Configuration.FlexorsByRegion.Clear();
             this.LegacyOpenGlove.resetFlexors();
-        }
-
-        public void ResetActuators()
-        {
-            List<int> regions = new List<int>();
-            List<string> intensities = new List<string>();
-
-            foreach(var entry in Configuration.ActuatorsByRegion)
-            {
-                regions.Add(entry.Key);
-                intensities.Add("0"); // 0 or LOW for turn off
-            }
-
-            this.ActivateActuators(regions, intensities); //Turn Off Actuators
-
-            Configuration.ActuatorsByRegion.Clear();      //Clear mapping
         }
 
         public void StartIMU()

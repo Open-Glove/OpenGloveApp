@@ -52,8 +52,8 @@ namespace OpenGloveApp.AppConstants
         AddOpenGloveDevice = 0,
         RemoveOpenGloveDevice,
         SaveOpenGloveDevice,
-        Connect,
-        Disconnect,
+        ConnectToBluetoothDevice,
+        DisconnectFromBluetoothDevice,
         StartCaptureDataFromServer,
         StopCaptureDataFromServer,
 
@@ -62,24 +62,36 @@ namespace OpenGloveApp.AppConstants
         RemoveActuator,
         RemoveActuators,
         ActivateActuators,
+        TurnOnActuators,
+        TurnOffActuators,
         ResetActuators,
 
-        AddFlexor = 13,
+        AddFlexor = 15,
         AddFlexors,
         RemoveFlexor,
         RemoveFlexors,
         CalibrateFlexors,
         ConfirmCalibration,
         SetThreshold,
+        TurnOnFlexors,
+        TurnOffFlexors,
         ResetFlexors,
 
-        StartIMU = 21,
+        StartIMU = 25,
         SetIMUStatus,
         SetRawData,
         SetIMUChoosingData,
+        ReadOnlyAccelerometerFromIMU,
+        ReadOnlyGyroscopeFromIMU,
+        ReadOnlyMagnetometerFromIMU,
+        ReadOnlyAttitudeFromIMU,
+        ReadAllDataFromIMU,
         CalibrateIMU,
 
-        SetLoopDelay = 26,
+        SetLoopDelay = 35,
+
+        ConnectToWebSocketServer,
+        DisconnecFromWebSocketServer = 37,
     }
 
     public enum PalmarRegion

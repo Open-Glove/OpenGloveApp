@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Fleck;
 using OpenGloveApp.AppConstants;
+using OpenGloveApp.Models;
 using OpenGloveApp.OpenGloveAPI;
 
 namespace OpenGloveApp.Server
@@ -15,6 +16,7 @@ namespace OpenGloveApp.Server
         private List<IWebSocketConnection> allSockets = new List<IWebSocketConnection>();
         private static Dictionary<string, IWebSocketConnection> webSocketByDeviceName = new Dictionary<string, IWebSocketConnection>();
         public static Dictionary<string, OpenGlove> OpenGloveByDeviceName = new Dictionary<string, OpenGlove>();
+        public static Dictionary<string, OpenGloveConfiguration> ConfigurationByDeviceName = new Dictionary<string, OpenGloveConfiguration>();
 
 
         public OpenGloveServer(string url)
@@ -35,8 +37,20 @@ namespace OpenGloveApp.Server
                 socket.OnClose = () =>
                 { 
                     Debug.WriteLine("Close WebSocket!");
-                    allSockets.Remove(socket);
-                    webSocketByDeviceName.ContainsValue(socket);
+                    try
+                    {
+                        if (webSocketByDeviceName.ContainsValue(socket) || allSockets.Contains(socket))
+                        {
+                            var item = webSocketByDeviceName.First(entry => entry.Value == socket);
+                            webSocketByDeviceName.Remove(item.Key);
+                            allSockets.Remove(socket);
+                        }
+                    }
+                    catch
+                    {
+                        Debug.WriteLine("WebSocketError: try quit webSocket from list of websocket connected");
+                    }
+
                 };
                 socket.OnMessage = message =>
                 {
@@ -145,12 +159,12 @@ namespace OpenGloveApp.Server
                         socket.Send($"[OpenGloveServer] SaveOpenGloveDevice: not implemented");
                         break;
 
-                    case (int)OpenGloveActions.Connect:
-                        TryConnect(socket, deviceName);
+                    case (int)OpenGloveActions.ConnectToBluetoothDevice:
+                        TryConnectToBluetoothDevice(socket, deviceName);
                         break;
 
-                    case (int)OpenGloveActions.Disconnect:
-                        TryDisconnect(socket, deviceName);
+                    case (int)OpenGloveActions.DisconnectFromBluetoothDevice:
+                        TryDisconnectFromBluetoothDevice(socket, deviceName);
                         break;
 
                     case (int)OpenGloveActions.StartCaptureDataFromServer:
@@ -191,6 +205,14 @@ namespace OpenGloveApp.Server
                         OpenGloveByDeviceName[deviceName].ActivateActuators(Regions, Intensities);
                         break;
 
+                    case (int)OpenGloveActions.TurnOnActuators:
+                        OpenGloveByDeviceName[deviceName].TurnOnActuators();
+                        break;
+
+                    case (int)OpenGloveActions.TurnOffActuators:
+                        OpenGloveByDeviceName[deviceName].TurnOffActuators();
+                        break;
+
                     case (int)OpenGloveActions.ResetActuators:
                         OpenGloveByDeviceName[deviceName].ResetActuators();
                         break;
@@ -228,6 +250,14 @@ namespace OpenGloveApp.Server
                     case (int)OpenGloveActions.SetThreshold:
                         Value = values.Split(',')[0];
                         OpenGloveByDeviceName[deviceName].SetThreshold(Int32.Parse(Value));
+                        break;
+
+                    case (int)OpenGloveActions.TurnOnFlexors:
+                        OpenGloveByDeviceName[deviceName].TurnOnFlexors();
+                        break;
+
+                    case (int)OpenGloveActions.TurnOffFlexors:
+                        OpenGloveByDeviceName[deviceName].TurnOffFlexors();
                         break;
 
                     case (int)OpenGloveActions.ResetFlexors:
@@ -290,6 +320,7 @@ namespace OpenGloveApp.Server
 
         public bool AddOpenGloveDevice(string deviceName)
         {
+            // TODO verify if exist a configuration for this bluetoothDeviceName
             if (!OpenGloveByDeviceName.ContainsKey(deviceName))
             {
                 OpenGlove openGlove = new OpenGlove(deviceName);
@@ -303,6 +334,8 @@ namespace OpenGloveApp.Server
         {
             if (OpenGloveByDeviceName.ContainsKey(deviceName))
             {
+                OpenGloveByDeviceName[deviceName].TurnOffActuators();
+                OpenGloveByDeviceName[deviceName].TurnOffFlexors();
                 OpenGloveByDeviceName[deviceName].CloseDeviceConnection(); //TODO await this mehod for close connection
                 OpenGloveByDeviceName.Remove(deviceName);
                 return true;
@@ -310,7 +343,7 @@ namespace OpenGloveApp.Server
             return false;
         }
 
-        public bool TryConnect(IWebSocketConnection socket, string deviceName)
+        public bool TryConnectToBluetoothDevice(IWebSocketConnection socket, string deviceName)
         {
             try
             {
@@ -330,7 +363,7 @@ namespace OpenGloveApp.Server
             }
         }
 
-        public bool TryDisconnect( IWebSocketConnection socket, string deviceName)
+        public bool TryDisconnectFromBluetoothDevice( IWebSocketConnection socket, string deviceName)
         {
             try
             {
