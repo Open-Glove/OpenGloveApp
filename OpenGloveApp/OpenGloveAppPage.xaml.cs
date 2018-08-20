@@ -25,6 +25,13 @@ namespace OpenGloveApp
         public const int MOTOR_EVALUATION = 501;
         public const int IMU_EVALUATION = 502;
 
+        public List<int>  Pins = new List<int> { 11, 12}; //{ 11, 12, 10, 15, 9, 16, 3, 2, 6, 8 };
+        public List<int> PositivePins  = new List<int> { 11, 10, 9, 3, 6 };
+        public List<int> NegativePins = new List<int> { 12, 15, 16, 2, 8 };
+        public List<int> FlexorPins = new List<int> { 17 };
+        public List<string> ValuesON = new List<string> { "HIGH", "HIGH", "HIGH", "HIGH", "HIGH" };
+        public List<string> ValuesOFF = new List<string> { "LOW", "LOW", "LOW", "LOW", "LOW" };
+
         // Vibe board: (+11 y -12), (+10 y -15), (+9 y -16), (+3 y -2), (+6, -8)
         public static List<int> mPins = new List<int> { 11, 12, 10, 15, 9, 16, 3, 2, 6, 8 };
         public static List<string> mValuesON = new List<string> { "HIGH", "LOW", "HIGH", "LOW", "HIGH", "LOW", "HIGH", "LOW", "HIGH", "LOW" };
@@ -136,13 +143,13 @@ namespace OpenGloveApp
             if (isMotorActive)
             {
                 buttonActivateMotor.Text = "Motor OFF";
-                OnBluetoothMessageSended(DISABLE_MOTORS,  mOpenGlove.Configuration.PositivePins, mOpenGlove.Configuration.ValuesOFF);
+                OnBluetoothMessageSended(DISABLE_MOTORS,  this.PositivePins, this.ValuesOFF);
                 isMotorActive = false;
             }
             else
             {
                 buttonActivateMotor.Text = "Motor ON";
-                OnBluetoothMessageSended(ACTIVATE_MOTORS, mOpenGlove.Configuration.PositivePins, mOpenGlove.Configuration.ValuesON);
+                OnBluetoothMessageSended(ACTIVATE_MOTORS, this.PositivePins, this.ValuesON);
                 isMotorActive = true;
             }
         }

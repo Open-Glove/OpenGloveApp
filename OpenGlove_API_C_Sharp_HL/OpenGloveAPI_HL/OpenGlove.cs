@@ -7,17 +7,43 @@ namespace OpenGlove_API_C_Sharp_HL.OpenGloveAPI_HL
     {
         public string Name { get; set; }
         public string BluetoothDeviceName { get { return this.BluetoothDeviceName; } set { this.BluetoothDeviceName = value; this.Communication.MessageGenerator.BluetoothDeviceName = value; } }
+        public string ConfigurationName { get { return this.ConfigurationName; } set { this.ConfigurationName = value; this.Communication.MessageGenerator.ConfigurationName = value; } }
         public Communication Communication { get; set; }
-        public bool IsConnected { get; set; }
+        private bool _IsConnectedToWebSocketServer { get { return this.Communication.WebSocket.IsAlive; } set {_IsConnectedToWebSocketServer = value; } }
+        private bool _IsConnectedToBluetoohDevice { get { return this.Communication.WebSocket.IsAlive; } set { _IsConnectedToWebSocketServer = value; } }
+        public bool IsConnectedToWebSocketServer { get { return _IsConnectedToWebSocketServer; } }
+        public bool IsConnectedToBluetoohDevice { get { return _IsConnectedToBluetoohDevice; } }
 
-        // TODO Need add ...
+        // TODO Need add data listener (flexors and IMU data ) EventHandlers ... for get subscribers in OnMessage of WebSocket ...
 
-        public OpenGlove(string name, string bluetoothDeviceName, string url)
+        public OpenGlove(string name, string bluetoothDeviceName, string configurationName, string url)
         {
             this.Name = name;
             this.BluetoothDeviceName = bluetoothDeviceName;
-            this.Communication = new Communication(bluetoothDeviceName, url);
-            this.IsConnected = false;
+            this.ConfigurationName = configurationName;
+            this.Communication = new Communication(bluetoothDeviceName, configurationName, url);
+            this._IsConnectedToWebSocketServer = false;
+            this._IsConnectedToBluetoohDevice = false;
+        }
+
+        public void Start()
+        {
+            this.Communication.StartOpenGlove();
+        }
+
+        public void Stop()
+        {
+            this.Communication.StopOpenGlove();
+        }
+
+        public void AssignOpenGloveConfiguration(string configurationName)
+        {
+            this.Communication.AssignOpenGloveConfiguration(configurationName);
+        }
+
+        public void InitializeOpenGloveConfigurationOnDevice()
+        {
+            this.Communication.InitializeOpenGloveConfigurationOnDevice();
         }
 
         public void AddOpenGloveDevice()
@@ -29,6 +55,7 @@ namespace OpenGlove_API_C_Sharp_HL.OpenGloveAPI_HL
         {
             this.Communication.AddOpenGloveDevice();
         }
+
         public void SaveOpenGloveDevice()
         {
             this.Communication.MessageGenerator.SaveOpenGloveDevice();
@@ -159,11 +186,12 @@ namespace OpenGlove_API_C_Sharp_HL.OpenGloveAPI_HL
             this.Communication.SetRawData(status); 
         }
 
-        /* 0 : a        Accelerometer
-         * 1 : g        Gyroscope
-         * 2 : m        Magnetometer
-         * 3 : r        Attitude
-         * default : z  Accelerometer, Gyroscope and Magnetometer
+        /* integer command      inside arduino code        IMU component
+         * 0                 :          a            :      Accelerometer
+         * 1                 :          g            :      Gyroscope
+         * 2                 :          m            :      Magnetometer
+         * 3                 :          r            :      Attitude
+         * default (other)   :          z            :      Accelerometer, Gyroscope and Magnetometer
         */
         public void SetIMUChoosingData(int value)
         {

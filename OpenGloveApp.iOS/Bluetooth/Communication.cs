@@ -34,11 +34,6 @@ namespace OpenGloveApp.iOS.Bluetooth
             throw new NotImplementedException();
         }
 
-        public void OpenDeviceConnection(ContentPage contentPage, BluetoothDevices bluetoothDevice)
-        {
-            throw new NotImplementedException();
-        }
-
         public void OpenDeviceConnection(string bluetoothDeviceName)
         {
             throw new NotImplementedException();

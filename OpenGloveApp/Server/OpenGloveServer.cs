@@ -11,39 +11,41 @@ namespace OpenGloveApp.Server
 {
     public class OpenGloveServer: Server
     {
-        private string url;
-        private WebSocketServer server; // sample "ws://127.0.0.1:7070"
-        private List<IWebSocketConnection> allSockets = new List<IWebSocketConnection>();
+        private string Url { get; set; }
+        private WebSocketServer Server; // sample "ws://127.0.0.1:7070"
+        private List<IWebSocketConnection> AllSockets = new List<IWebSocketConnection>();
         private static Dictionary<string, IWebSocketConnection> webSocketByDeviceName = new Dictionary<string, IWebSocketConnection>();
         public static Dictionary<string, OpenGlove> OpenGloveByDeviceName = new Dictionary<string, OpenGlove>();
-        public static Dictionary<string, OpenGloveConfiguration> ConfigurationByDeviceName = new Dictionary<string, OpenGloveConfiguration>();
+
+        public static Dictionary<string, OpenGloveConfiguration> ConfigurationByName = new Dictionary<string, OpenGloveConfiguration>();
+        //public static Dictionary<string, OpenGloveConfiguration> ConfigurationByDeviceName = new Dictionary<string, OpenGloveConfiguration>();
 
 
         public OpenGloveServer(string url)
         {
-            this.url = url;
+            this.Url = url;
         }
 
         public void StartWebsockerServer()
         {
             FleckLog.Level = LogLevel.Debug;
-            server.Start(socket =>
+            Server.Start(socket =>
             {
                 socket.OnOpen = () =>
                 {
                     Debug.WriteLine("Open WebSocket!");
-                    allSockets.Add(socket);
+                    AllSockets.Add(socket);
                 };
                 socket.OnClose = () =>
                 { 
                     Debug.WriteLine("Close WebSocket!");
                     try
                     {
-                        if (webSocketByDeviceName.ContainsValue(socket) || allSockets.Contains(socket))
+                        if (webSocketByDeviceName.ContainsValue(socket) || AllSockets.Contains(socket))
                         {
                             var item = webSocketByDeviceName.First(entry => entry.Value == socket);
                             webSocketByDeviceName.Remove(item.Key);
-                            allSockets.Remove(socket);
+                            AllSockets.Remove(socket);
                         }
                     }
                     catch
@@ -61,12 +63,12 @@ namespace OpenGloveApp.Server
 
         public void CloseAllSockets()
         {
-            allSockets.ToList().ForEach(s => s.Close());
+            AllSockets.ToList().ForEach(s => s.Close());
         }
 
         override public void Start()
         {
-            this.server = new WebSocketServer(url);
+            this.Server = new WebSocketServer(Url);
             ConfigureServer();
             StartWebsockerServer();
         }
@@ -74,13 +76,13 @@ namespace OpenGloveApp.Server
         override public void Stop()
         {
             CloseAllSockets();
-            server.Dispose(); //this method does not allow more incoming connections, and disconnect the server. So it is necessary to disconnect all sockets first to cut off all communication
-            allSockets.Clear();
+            Server.Dispose(); //this method does not allow more incoming connections, and disconnect the server. So it is necessary to disconnect all sockets first to cut off all communication
+            AllSockets.Clear();
         }
 
         override public void ConfigureServer()
         {
-            server.RestartAfterListenError = true;
+            Server.RestartAfterListenError = true;
         }
 
         /* WebSocket format message:  ACTION;DEVICE;REGIONS;VALUES;EXTRA_VALUES
@@ -129,7 +131,6 @@ namespace OpenGloveApp.Server
 
         }
 
-
         // For add news actions on OpenGloveServer
         public void SwitchOpenGloveActions(IWebSocketConnection socket, string message, int what, string deviceName, string regions, string values, string extraValues)
         {
@@ -147,6 +148,22 @@ namespace OpenGloveApp.Server
             {
                 switch (what)
                 {
+                    case (int)OpenGloveActions.StartOpenGlove:
+                        Value = values;
+                        socket.Send("Load Configuration on OpenGlove instance");
+                        LoadConfigurationToOpenGloveInstance(deviceName, Value);
+                        socket.Send("StartIMU");
+                        OpenGloveByDeviceName[deviceName].StartIMU(); //for setup IMU on Board, imu status changed to true ...
+                        socket.Send("InitializeOpenGloveOnDevice");
+                        InitializeOpenGloveConfigurationOnDevice(deviceName);
+                        socket.Send("StartCaptureDataFromServer");
+                        StartCaptureDataFromServer(socket, deviceName);
+                        break;
+
+                    case (int)OpenGloveActions.StopOpenGlove:
+                        OpenGloveByDeviceName[deviceName].TurnOffAllOpenGloveComponents();
+                        break;
+
                     case (int)OpenGloveActions.AddOpenGloveDevice:
                         AddOpenGloveDevice(deviceName);
                         break;
@@ -168,11 +185,11 @@ namespace OpenGloveApp.Server
                         break;
 
                     case (int)OpenGloveActions.StartCaptureDataFromServer:
-                        webSocketByDeviceName.Add(deviceName, socket);
+                        StartCaptureDataFromServer(socket, deviceName);
                         break;
 
                     case (int)OpenGloveActions.StopCaptureDataFromServer:
-                        webSocketByDeviceName.Remove(deviceName);
+                        StopCaptureDataFromServer(deviceName);
                         break;
 
                     case (int)OpenGloveActions.AddActuator:
@@ -320,7 +337,6 @@ namespace OpenGloveApp.Server
 
         public bool AddOpenGloveDevice(string deviceName)
         {
-            // TODO verify if exist a configuration for this bluetoothDeviceName
             if (!OpenGloveByDeviceName.ContainsKey(deviceName))
             {
                 OpenGlove openGlove = new OpenGlove(deviceName);
@@ -336,11 +352,33 @@ namespace OpenGloveApp.Server
             {
                 OpenGloveByDeviceName[deviceName].TurnOffActuators();
                 OpenGloveByDeviceName[deviceName].TurnOffFlexors();
+                OpenGloveByDeviceName[deviceName].TurnOffIMU();
                 OpenGloveByDeviceName[deviceName].CloseDeviceConnection(); //TODO await this mehod for close connection
                 OpenGloveByDeviceName.Remove(deviceName);
                 return true;
             }
             return false;
+        }
+
+        public void LoadConfigurationToOpenGloveInstance(string deviceName, string configurationName)
+        {
+            if (configurationName != null && deviceName != null)
+            {
+                if (ConfigurationByName.ContainsKey(configurationName))
+                    OpenGloveByDeviceName[deviceName].Configuration = ConfigurationByName[configurationName];
+                else
+                {
+                    OpenGloveConfiguration configuration = new OpenGloveConfiguration(configurationName);
+                    OpenGloveByDeviceName[deviceName].Configuration = configuration;
+                    ConfigurationByName.Add(configurationName, configuration);
+                }
+            }
+        }
+
+        public void InitializeOpenGloveConfigurationOnDevice(string deviceName)
+        {
+            if(deviceName != null)
+                OpenGloveByDeviceName[deviceName].InitializeOpenGloveConfigurationOnDevice(); //equals to .InitializeActuators, .InitializeFlexors and .InitializeIMU
         }
 
         public bool TryConnectToBluetoothDevice(IWebSocketConnection socket, string deviceName)
@@ -386,5 +424,15 @@ namespace OpenGloveApp.Server
             }
         }
 
+        public void StartCaptureDataFromServer(IWebSocketConnection socket, string deviceName)
+        {
+            if(!webSocketByDeviceName.ContainsKey(deviceName))
+                webSocketByDeviceName.Add(deviceName, socket);
+        }
+
+        public void StopCaptureDataFromServer(string deviceName)
+        {
+            webSocketByDeviceName.Remove(deviceName);
+        }
     }
 }

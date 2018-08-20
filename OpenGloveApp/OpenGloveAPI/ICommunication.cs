@@ -21,12 +21,6 @@ namespace OpenGloveApp.OpenGloveAPI
         /// </summary>
         /// <param name="bluetoothDevice"> The device to connect </param>
         void OpenDeviceConnection(string bluetoothDeviceName);
-        /// <summary>
-        /// Open a Connection with the Bluetooth Device
-        /// </summary>
-        /// <param name="contentPage"> The Page of xamarin.forms, the thread UI subscribe to Connected Thread</param>
-        /// <param name="bluetoothDevice"> The device to connect </param>
-        void OpenDeviceConnection(ContentPage contentPage, BluetoothDevices bluetoothDevice);
         void CloseDeviceConnection();
         /// <summary>
         /// Returns an array with all active serial ports names

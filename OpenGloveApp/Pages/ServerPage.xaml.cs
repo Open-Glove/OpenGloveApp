@@ -43,7 +43,7 @@ namespace OpenGloveApp.Pages
             {
                 instancedServer = false;
                 Debug.WriteLine("FormatException: " + formatException.Message);
-                DisplayAlert("Error", "Example server End Point: \n ws://127.0.0.1:7171", "OK");
+                DisplayAlert("Error", "Example server End Point: \n ws://127.0.0.1:7070", "OK");
             }
 
             if (instancedServer)

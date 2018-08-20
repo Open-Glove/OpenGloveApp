@@ -26,6 +26,27 @@ namespace OpenGloveApp.OpenGloveAPI
             this.Configuration = configuration;
         }
 
+        public void TurnOnAllOpenGloveComponents()
+        {
+            this.TurnOnActuators();
+            this.TurnOnFlexors();
+            this.TurnOnIMU();
+        }
+
+        public void TurnOffAllOpenGloveComponents()
+        {
+            this.TurnOffActuators();
+            this.TurnOffFlexors();
+            this.TurnOffIMU();
+        }
+
+        public void InitializeOpenGloveConfigurationOnDevice()
+        {
+            this.InitializeActuators();
+            this.InitializeFlexors();
+            this.InitializeIMU();
+        }
+
         public void InitializeActuators()
         {
             if (BooleanStatements.NoNullAndCountGreaterThanZero(this.Configuration.ActuatorsByRegion))
@@ -52,6 +73,18 @@ namespace OpenGloveApp.OpenGloveAPI
                 {
                     this.LegacyOpenGlove.addFlexor(flexorByRegion.Value, flexorByRegion.Key);
                 }
+            }
+        }
+
+        public void InitializeIMU()
+        {
+            if(this.Configuration != null)
+            {
+                this.StartIMU();
+                this.SetThreshold(this.Configuration.Threshold);
+                this.SetIMUStatus(this.Configuration.IMUStatus);
+                this.SetIMUChoosingData(this.Configuration.IMUChoosingData);
+                this.SetLoopDelay(this.Configuration.SetLoopDelay);
             }
         }
 
@@ -250,6 +283,16 @@ namespace OpenGloveApp.OpenGloveAPI
         {
             int integerStatus = (status) ? 1 : 0;
             this.LegacyOpenGlove.setIMUStatus(integerStatus);
+        }
+
+        public void TurnOnIMU()
+        {
+            this.SetIMUStatus(true);
+        }
+
+        public void TurnOffIMU()
+        {
+            this.SetIMUStatus(false);
         }
 
         public void SetRawData(bool status)

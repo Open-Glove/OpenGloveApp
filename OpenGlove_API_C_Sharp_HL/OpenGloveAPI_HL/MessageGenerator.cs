@@ -7,15 +7,19 @@ namespace OpenGlove_API_C_Sharp_HL.OpenGloveAPI_HL
     {
         public enum OpenGloveActions
         {
-            AddOpenGloveDevice = 0,
+            StartOpenGlove = 0,
+            StopOpenGlove,
+            AddOpenGloveDevice,
             RemoveOpenGloveDevice,
             SaveOpenGloveDevice,
             ConnectToBluetoothDevice,
             DisconnectFromBluetoothDevice,
+            ConnectToWebSocketServer,
+            DisconnecFromWebSocketServer,
             StartCaptureDataFromServer,
             StopCaptureDataFromServer,
 
-            AddActuator = 7,
+            AddActuator = 11,
             AddActuators,
             RemoveActuator,
             RemoveActuators,
@@ -24,7 +28,7 @@ namespace OpenGlove_API_C_Sharp_HL.OpenGloveAPI_HL
             TurnOffActuators,
             ResetActuators,
 
-            AddFlexor = 15,
+            AddFlexor = 19,
             AddFlexors,
             RemoveFlexor,
             RemoveFlexors,
@@ -35,7 +39,7 @@ namespace OpenGlove_API_C_Sharp_HL.OpenGloveAPI_HL
             TurnOffFlexors,
             ResetFlexors,
 
-            StartIMU = 25,
+            StartIMU = 29,
             SetIMUStatus,
             SetRawData,
             SetIMUChoosingData,
@@ -46,20 +50,19 @@ namespace OpenGlove_API_C_Sharp_HL.OpenGloveAPI_HL
             ReadAllDataFromIMU,
             CalibrateIMU,
 
-            SetLoopDelay = 35,
-
-            ConnectToWebSocketServer,
-            DisconnecFromWebSocketServer = 37,
+            SetLoopDelay = 39,
         }
 
         public string BluetoothDeviceName { get; set; }
+        public string ConfigurationName { get; set; }
         public string MainSeparator { get; set; }
         public string SecondarySeparator { get; set; }
         public string Empty { get; set; }
 
-        public MessageGenerator(string bluetoothDeviceName, string mainSeparator, string secondarySeparator, string empty)
+        public MessageGenerator(string bluetoothDeviceName, string configurationName, string mainSeparator, string secondarySeparator, string empty)
         {
             this.BluetoothDeviceName = bluetoothDeviceName;
+            this.ConfigurationName = configurationName;
             this.MainSeparator = mainSeparator;
             this.SecondarySeparator = secondarySeparator;
             this.Empty = empty;
@@ -81,6 +84,16 @@ namespace OpenGlove_API_C_Sharp_HL.OpenGloveAPI_HL
         {
             string booleanString = (value) ? "True" : "False";
             return booleanString;
+        }
+
+        public string StartOpenGlove()
+        {
+            return Join(MainSeparator, OpenGloveActions.StartOpenGlove, BluetoothDeviceName, Empty, ConfigurationName, Empty);
+        }
+
+        public string StopOpenGlove()
+        {
+            return Join(MainSeparator, OpenGloveActions.StopOpenGlove, BluetoothDeviceName, Empty, Empty, Empty);
         }
 
         public string AddOpenGloveDevice()
