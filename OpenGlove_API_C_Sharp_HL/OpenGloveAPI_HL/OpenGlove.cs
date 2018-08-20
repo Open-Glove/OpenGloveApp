@@ -56,9 +56,9 @@ namespace OpenGlove_API_C_Sharp_HL.OpenGloveAPI_HL
             this.Communication.AddOpenGloveDevice();
         }
 
-        public void SaveOpenGloveDevice()
+        public void SaveOpenGloveConfiguration()
         {
-            this.Communication.MessageGenerator.SaveOpenGloveDevice();
+            this.Communication.MessageGenerator.SaveOpenGloveConfiguration();
         }
 
         public void ConnectToBluetoothDevice()

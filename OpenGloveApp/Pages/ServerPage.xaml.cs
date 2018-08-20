@@ -8,6 +8,14 @@ namespace OpenGloveApp.Pages
     public partial class ServerPage : ContentPage
     {
         public static OpenGloveServer OpenGloveServer;
+        /*  TODO future work: Add a logger for all Messages 
+         *      - Support Turn On and Off logger, clear logger
+         *      - Support Filter logger: 
+         *          - all messages sended an received
+         *          - only flexors messages
+         *          - only IMU messages
+         *          - only Commands from Clients (activate actuators, add flexor, remove actuator, etc.)
+         */
 
         public ServerPage()
         {

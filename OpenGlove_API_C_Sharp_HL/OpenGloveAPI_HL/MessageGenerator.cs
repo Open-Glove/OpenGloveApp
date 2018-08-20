@@ -11,7 +11,7 @@ namespace OpenGlove_API_C_Sharp_HL.OpenGloveAPI_HL
             StopOpenGlove,
             AddOpenGloveDevice,
             RemoveOpenGloveDevice,
-            SaveOpenGloveDevice,
+            SaveOpenGloveConfiguration,
             ConnectToBluetoothDevice,
             DisconnectFromBluetoothDevice,
             ConnectToWebSocketServer,
@@ -105,9 +105,9 @@ namespace OpenGlove_API_C_Sharp_HL.OpenGloveAPI_HL
         {
             return Join(MainSeparator, OpenGloveActions.RemoveOpenGloveDevice, BluetoothDeviceName, Empty, Empty, Empty);
         }
-        public string SaveOpenGloveDevice()
+        public string SaveOpenGloveConfiguration()
         {
-            return Join(MainSeparator, OpenGloveActions.SaveOpenGloveDevice, BluetoothDeviceName, Empty, Empty, Empty);
+            return Join(MainSeparator, OpenGloveActions.SaveOpenGloveConfiguration, BluetoothDeviceName, Empty, ConfigurationName, Empty);
         }
 
         public string ConnectToBluetoothDevice()

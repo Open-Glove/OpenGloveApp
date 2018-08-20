@@ -150,13 +150,8 @@ namespace OpenGloveApp.Server
                 {
                     case (int)OpenGloveActions.StartOpenGlove:
                         Value = values;
-                        socket.Send("Load Configuration on OpenGlove instance");
                         LoadConfigurationToOpenGloveInstance(deviceName, Value);
-                        socket.Send("StartIMU");
-                        OpenGloveByDeviceName[deviceName].StartIMU(); //for setup IMU on Board, imu status changed to true ...
-                        socket.Send("InitializeOpenGloveOnDevice");
                         InitializeOpenGloveConfigurationOnDevice(deviceName);
-                        socket.Send("StartCaptureDataFromServer");
                         StartCaptureDataFromServer(socket, deviceName);
                         break;
 
@@ -172,8 +167,9 @@ namespace OpenGloveApp.Server
                         RemoveOpenGloveDevice(deviceName);
                         break;
 
-                    case (int)OpenGloveActions.SaveOpenGloveDevice:
-                        socket.Send($"[OpenGloveServer] SaveOpenGloveDevice: not implemented");
+                    case (int)OpenGloveActions.SaveOpenGloveConfiguration:
+                        Value = values;
+                        SaveOpenGloveConfiguration(deviceName, Value);
                         break;
 
                     case (int)OpenGloveActions.ConnectToBluetoothDevice:
@@ -379,6 +375,16 @@ namespace OpenGloveApp.Server
         {
             if(deviceName != null)
                 OpenGloveByDeviceName[deviceName].InitializeOpenGloveConfigurationOnDevice(); //equals to .InitializeActuators, .InitializeFlexors and .InitializeIMU
+        }
+
+        public void SaveOpenGloveConfiguration(string deviceName, string configurationName)
+        {
+            if (configurationName != null)
+            {
+                if (ConfigurationByName.ContainsKey(configurationName))
+                    ConfigurationByName.Remove(configurationName);
+                ConfigurationByName.Add(configurationName, OpenGloveByDeviceName[deviceName].Configuration);
+            }
         }
 
         public bool TryConnectToBluetoothDevice(IWebSocketConnection socket, string deviceName)

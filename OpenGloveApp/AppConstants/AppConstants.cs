@@ -53,7 +53,7 @@ namespace OpenGloveApp.AppConstants
         StopOpenGlove,
         AddOpenGloveDevice,
         RemoveOpenGloveDevice,
-        SaveOpenGloveDevice,
+        SaveOpenGloveConfiguration,
         ConnectToBluetoothDevice,
         DisconnectFromBluetoothDevice,
         ConnectToWebSocketServer,
