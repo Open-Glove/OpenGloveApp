@@ -152,19 +152,18 @@ namespace OpenGloveApp.Server
                         Value = values;
                         LoadConfigurationToOpenGloveInstance(deviceName, Value);
                         InitializeOpenGloveConfigurationOnDevice(deviceName);
-                        StartCaptureDataFromServer(socket, deviceName);
                         break;
 
                     case (int)OpenGloveActions.StopOpenGlove:
                         OpenGloveByDeviceName[deviceName].TurnOffAllOpenGloveComponents();
                         break;
 
-                    case (int)OpenGloveActions.AddOpenGloveDevice:
-                        AddOpenGloveDevice(deviceName);
+                    case (int)OpenGloveActions.AddOpenGloveDeviceToServer:
+                        AddOpenGloveDeviceToServer(deviceName);
                         break;
 
-                    case (int)OpenGloveActions.RemoveOpenGloveDevice:
-                        RemoveOpenGloveDevice(deviceName);
+                    case (int)OpenGloveActions.RemoveOpenGloveDeviceFromServer:
+                        RemoveOpenGloveDeviceFromServer(deviceName);
                         break;
 
                     case (int)OpenGloveActions.SaveOpenGloveConfiguration:
@@ -335,7 +334,7 @@ namespace OpenGloveApp.Server
             }
         }
 
-        public bool AddOpenGloveDevice(string deviceName)
+        public bool AddOpenGloveDeviceToServer(string deviceName)
         {
             if (!OpenGloveByDeviceName.ContainsKey(deviceName))
             {
@@ -346,7 +345,7 @@ namespace OpenGloveApp.Server
             return false;
         }
 
-        public bool RemoveOpenGloveDevice(string deviceName)
+        public bool RemoveOpenGloveDeviceFromServer(string deviceName)
         {
             if (OpenGloveByDeviceName.ContainsKey(deviceName))
             {

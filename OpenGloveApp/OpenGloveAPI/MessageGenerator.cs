@@ -516,6 +516,5 @@ namespace OpenGloveApp.OpenGloveAPI
             string message = getOpenGloveArduinoSoftwareVersionFunctionNumber + terminal;
             return message;
         }
-
     }
 }

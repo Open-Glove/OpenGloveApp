@@ -51,8 +51,8 @@ namespace OpenGloveApp.AppConstants
     {
         StartOpenGlove = 0,
         StopOpenGlove,
-        AddOpenGloveDevice,
-        RemoveOpenGloveDevice,
+        AddOpenGloveDeviceToServer,
+        RemoveOpenGloveDeviceFromServer,
         SaveOpenGloveConfiguration,
         ConnectToBluetoothDevice,
         DisconnectFromBluetoothDevice,
@@ -94,7 +94,7 @@ namespace OpenGloveApp.AppConstants
 
         SetLoopDelay = 39,
 
-        GetOpenGloveArduinoSoftwareVersion,
+        GetOpenGloveArduinoSoftwareVersion = 99,
     }
 
     public enum PalmarRegion
