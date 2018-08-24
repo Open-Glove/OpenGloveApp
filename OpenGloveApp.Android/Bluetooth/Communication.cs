@@ -270,9 +270,9 @@ namespace OpenGloveApp.Droid.Bluetooth
                 // Keep listening to the InputStream whit a StreamReader until an exception occurs
                 string line;
 
-                OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].InitializeActuators();
-                OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].InitializeFlexors();
-                OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].InitializeIMU();
+                OnBluetoothDataReceived(this.Id, this.mmDeviceName, "IsBluetoothDeviceConnected: " + mmSocket.IsConnected.ToString());
+                OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].IsConnected = mmSocket.IsConnected;
+                OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].InitializeOpenGloveConfigurationOnDevice();
 
                 while (TurnON)
                 {
@@ -284,6 +284,7 @@ namespace OpenGloveApp.Droid.Bluetooth
 
                         if (line != null)
                         {
+                            //Debug.WriteLine($"from ConnectedThread {this.Id}, line: {line}");
                             //Raise the event to WebSocket Server, that need stay subscriber to this publisher thread
                             OnBluetoothDataReceived(this.Id, this.mmDeviceName, line);
                         }
@@ -291,9 +292,10 @@ namespace OpenGloveApp.Droid.Bluetooth
                         {
                             Debug.WriteLine($"BluetoothSocket is Disconnected, Trying Connect");
                             mmSocket.Connect();
-                            OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].InitializeActuators();
-                            OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].InitializeFlexors();
-                            OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].InitializeIMU();
+
+                            OnBluetoothDataReceived(this.Id, this.mmDeviceName, "IsBluetoothDeviceConnected: " + mmSocket.IsConnected.ToString());
+                            OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].IsConnected = mmSocket.IsConnected;
+                            OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].InitializeOpenGloveConfigurationOnDevice();
                         }
                     }
                     catch (Java.IO.IOException e)
@@ -461,6 +463,8 @@ namespace OpenGloveApp.Droid.Bluetooth
                 {
                     mmSocket.Close();
                     TurnON = false;
+                    OnBluetoothDataReceived(this.Id, this.mmDeviceName, "IsBluetoothDeviceConnected: " + mmSocket.IsConnected.ToString());
+                    OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].IsConnected = mmSocket.IsConnected;
                 }
                 catch (Java.IO.IOException e)
                 {

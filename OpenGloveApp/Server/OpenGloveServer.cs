@@ -305,6 +305,9 @@ namespace OpenGloveApp.Server
                         OpenGloveByDeviceName[deviceName].SetLoopDelay(Int32.Parse(Value));
                         break;
 
+                    case (int)OpenGloveActions.GetOpenGloveArduinoSoftwareVersion:
+                        OpenGloveByDeviceName[deviceName].GetOpenGloveArduinoSofwareVersion();
+                        break;
                     default:
                         socket.Send("You said: " + message); // test echo message
                         break;
@@ -326,6 +329,7 @@ namespace OpenGloveApp.Server
         {
             if (e.Message != null)
             {
+                Debug.WriteLine(e.Message);
                 if (webSocketByDeviceName.ContainsKey(e.DeviceName))
                     webSocketByDeviceName[e.DeviceName].Send(e.Message);
             }

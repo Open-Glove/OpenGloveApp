@@ -14,7 +14,7 @@ namespace OpenGloveApp.Models
         public bool IMUStatus { get; set; }
         public bool IMURawData { get; set; }
         public int IMUChoosingData { get; set; }
-        public int SetLoopDelay { get; set; } //Miliseconds
+        public int LoopDelay { get; set; } //Miliseconds
         //TODO Calibration of flexors is always necesary to start ... set the calibration on configuration ... Future Work
 
         public OpenGloveConfiguration()
@@ -23,7 +23,7 @@ namespace OpenGloveApp.Models
             this.IMUStatus = true;
             this.IMUChoosingData = -1; //Get All Data Accelerometer, Gyroscope and Magnetometer
             this.IMURawData = false;
-            this.SetLoopDelay = 60;
+            this.LoopDelay = 60;
         }
 
         public OpenGloveConfiguration(string name)
@@ -33,7 +33,7 @@ namespace OpenGloveApp.Models
             this.IMUStatus = true;
             this.IMUChoosingData = -1; //Get All Data Accelerometer, Gyroscope and Magnetometer
             this.IMURawData = false;
-            this.SetLoopDelay = 60;
+            this.LoopDelay = 60;
         }
     }
 }

@@ -89,6 +89,8 @@ namespace OpenGloveApp.OpenGloveAPI
         /// </summary>
         private string setLoopDelayNumber = "0";
 
+        private string getOpenGloveArduinoSoftwareVersionFunctionNumber = "99";
+
 
         /// <summary>
         /// Generate a message to initialize pins like motors in the control software
@@ -182,7 +184,6 @@ namespace OpenGloveApp.OpenGloveAPI
             }
 
             activateMessage.Append(terminal);
-
             return activateMessage.ToString();
 
         }
@@ -507,6 +508,12 @@ namespace OpenGloveApp.OpenGloveAPI
         public string setChoosingData(int value)
         {
             string message = setChoosingDataFunctionNumber + separator + value + terminal;
+            return message;
+        }
+
+        public string getOpenGloveArduinoSoftwareVersion()
+        {
+            string message = getOpenGloveArduinoSoftwareVersionFunctionNumber + terminal;
             return message;
         }
 

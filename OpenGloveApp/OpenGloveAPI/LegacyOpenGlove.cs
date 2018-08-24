@@ -276,5 +276,10 @@ namespace OpenGloveApp.OpenGloveAPI
             string message = messageGenerator.setChoosingData(value);
             communication.Write(message);
         }
+
+        public void GetOpenGloveArduinoSoftwareVersion(){
+            string message = messageGenerator.getOpenGloveArduinoSoftwareVersion();
+            communication.Write(message);
+        }
     }
 }

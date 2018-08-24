@@ -84,7 +84,7 @@ namespace OpenGloveApp.OpenGloveAPI
                 this.SetThreshold(this.Configuration.Threshold);
                 this.SetIMUStatus(this.Configuration.IMUStatus);
                 this.SetIMUChoosingData(this.Configuration.IMUChoosingData);
-                this.SetLoopDelay(this.Configuration.SetLoopDelay);
+                this.SetLoopDelay(this.Configuration.LoopDelay);
             }
         }
 
@@ -328,8 +328,14 @@ namespace OpenGloveApp.OpenGloveAPI
         {
             this.TurnOffFlexors();
             this.TurnOffActuators();
+            this.TurnOffIMU();
             this.LegacyOpenGlove.communication.CloseDeviceConnection(); //TODO this need await bool CloseDeviceConnection()
             this.IsConnected = false;
+        }
+
+        public void GetOpenGloveArduinoSofwareVersion()
+        {
+            this.LegacyOpenGlove.GetOpenGloveArduinoSoftwareVersion();
         }
     }
 }

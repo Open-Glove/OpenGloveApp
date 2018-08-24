@@ -93,6 +93,8 @@ namespace OpenGloveApp.AppConstants
         CalibrateIMU,
 
         SetLoopDelay = 39,
+
+        GetOpenGloveArduinoSoftwareVersion,
     }
 
     public enum PalmarRegion
