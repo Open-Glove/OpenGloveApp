@@ -47,7 +47,10 @@ namespace OpenGloveApp.OpenGloveAPI
         /// Number that identifies the message like analogWrite function in the control software
         /// </summary>
         private string analogWriteInputFunctionNumber = "8";
-
+        /// <summary>
+        ///  Number that identifies the message like activateMotorTimeTest function in the control software
+        /// </summary>
+        private string activateMotorTimeTestFunctionNumber = "9";
         /// <summary>
         /// Description
         /// </summary>
@@ -187,6 +190,77 @@ namespace OpenGloveApp.OpenGloveAPI
             return activateMessage.ToString();
 
         }
+
+        /// <summary>
+        /// Generate a message to activate motors. Each motor is activated with the value in the same index
+        /// (And the Arduino software control send the time of activation in microseconds, with the format: us,1000).
+        /// </summary>
+        /// <param name="pins">List of pins where are connected the motors</param>
+        /// <param name="values">List with the intensities to activate the motors. It can be "HIGH" or "LOW" in digital mode or a number between 0 and 255 in analog mode</param>
+        /// <returns>A string with the "activateMotor" format specified in the OpenGlove communication protocol</returns>
+        public string ActivateMotorTimeTest(IEnumerable<int> pins, IEnumerable<string> values)
+        {
+
+            if (pins.Count() != values.Count())
+            {
+                throw new System.ArgumentException("Lists length must be equal");
+            }
+
+            var activateMessage = new StringBuilder();
+
+            activateMessage.Append(activateMotorTimeTestFunctionNumber + separator + pins.Count());
+
+            for (var i = 0; i < pins.Count(); i++)
+            {
+                var value = "";
+
+                if (values.ElementAt(i) == "HIGH")
+                {
+                    value = "-1";
+                }
+
+                else if (values.ElementAt(i) == "LOW")
+                {
+                    value = "-2";
+                }
+
+                else
+                {
+                    try
+                    {
+
+                        var valueAux = Int32.Parse(values.ElementAt(i));
+
+                        if ((valueAux < 256) && (valueAux >= 0))
+                        {
+                            value = valueAux.ToString();
+                        }
+
+                        else
+                        {
+                            throw new ArgumentException("Values must be between 0 and 255");
+                        }
+
+                    }
+
+
+                    catch (System.FormatException e)
+                    {
+                        Debug.WriteLine(e.StackTrace);
+                        throw new ArgumentException("Invalid value " + values.ElementAt(i));
+                    }
+
+                }
+
+                var message = separator + pins.ElementAt(i) + separator + value;
+                activateMessage.Append(message);
+            }
+
+            activateMessage.Append(terminal);
+            return activateMessage.ToString();
+
+        }
+
         /// <summary>
         /// Generate a message to read from an analog pin
         /// </summary>

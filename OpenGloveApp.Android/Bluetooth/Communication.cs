@@ -70,7 +70,8 @@ namespace OpenGloveApp.Droid.Bluetooth
 
         public void CloseDeviceConnection()
         {
-            mBluetoothManagementThread.Close();
+            if(mBluetoothManagementThread != null)
+                    mBluetoothManagementThread.Close();
         }
 
         public void UpdatePairedDevices()
@@ -114,12 +115,17 @@ namespace OpenGloveApp.Droid.Bluetooth
 
         public void Write(string message)
         {
-            mBluetoothManagementThread.Write(message);
+            if (mBluetoothManagementThread != null)
+                if (mBluetoothManagementThread.IsAlive)
+                    mBluetoothManagementThread.Write(message);
         }
 
         public string ReadLine()
         {
-            return mBluetoothManagementThread.ReadLine();
+            if (mBluetoothManagementThread != null)
+                return mBluetoothManagementThread.ReadLine();
+            else
+                return null;
         }
 
         public void ClosePort()
@@ -129,6 +135,8 @@ namespace OpenGloveApp.Droid.Bluetooth
 
         public class ConnectThread : Java.Lang.Thread
         {
+            // Event for send data from Bluetooth Socket to subcribers
+            public event EventHandler<BluetoothEventArgs> BluetoothDataReceived;
             private BluetoothSocket mmSocket;
             private BluetoothDevice mmDevice;
             private BluetoothAdapter mmBluetoothAdapter;
@@ -175,6 +183,13 @@ namespace OpenGloveApp.Droid.Bluetooth
                 mmSocket = auxSocket;
             }
 
+            // Method for raise the event: Bluetooth Socket (handled by thread) to WebSocket Server
+            protected virtual void OnBluetoothDataReceived(long threadId, string deviceName, string message)
+            {
+                BluetoothDataReceived?.Invoke(this, new BluetoothEventArgs()
+                { ThreadId = threadId, DeviceName = deviceName, Message = message });
+            }
+
             override
             public void Run()
             {
@@ -192,10 +207,12 @@ namespace OpenGloveApp.Droid.Bluetooth
                     // TODO manageConnectedSocket(mmSocket);
                     mBluetoothManagementThread = new ConnectedThread(mmDevice, mmSocket);
                     mBluetoothManagementThread.Start();
+                    OnBluetoothDataReceived(this.Id, this.mmDevice.Name, "b," + mmSocket.IsConnected.ToString()); // b,True Or b,False for BluetoothDeviceConnection state
                 }
                 catch (Java.IO.IOException e)
                 {
                     mmSocket.Close();
+                    OnBluetoothDataReceived(this.Id, this.mmDevice.Name, "b," + "False"); // b,True Or b,False for BluetoothDeviceConnection state
                     Debug.WriteLine("BluetoothSocket: NOT CONNECTED");
                     e.PrintStackTrace();
                 }
@@ -216,7 +233,6 @@ namespace OpenGloveApp.Droid.Bluetooth
             private MessageGenerator mMessageGenerator = new MessageGenerator();
             private List<int> mFlexorPins = new List<int> { 17 }; //TODO delete this
             private bool TurnON = true;
-            public int mEvaluation = 0; //OpenGloveAppPage.FLEXOR_EVALUATION; //OpenGloveAppPage.MOTOR_EVALUATION;
             public bool mIsBluetoothDeviceConnected = false;
 
             public ConnectedThread(BluetoothDevice device, BluetoothSocket bluetoothSocket)
@@ -250,19 +266,7 @@ namespace OpenGloveApp.Droid.Bluetooth
             override
             public void Run()
             {
-
-                switch (mEvaluation)
-                {
-                    case OpenGloveAppPage.FLEXOR_EVALUATION:
-                        FlexorTest(1000, 1, "latency-test", "flexor1XamarinNexus.csv");
-                        break;
-                    case OpenGloveAppPage.MOTOR_EVALUATION:
-                        MotorTest(1000, 5, "latency-test", "motor5XamarinNexus.csv");
-                        break;
-                    default:
-                        MainRutine();
-                        break;
-                }
+                MainRutine(); //You can add other Rutines for Management BluetoothDeviceConnection
             }
 
             private void MainRutine()
@@ -270,7 +274,7 @@ namespace OpenGloveApp.Droid.Bluetooth
                 // Keep listening to the InputStream whit a StreamReader until an exception occurs
                 string line;
 
-                OnBluetoothDataReceived(this.Id, this.mmDeviceName, "b," + mmSocket.IsConnected.ToString());
+                OnBluetoothDataReceived(this.Id, this.mmDeviceName, "b," + mmSocket.IsConnected.ToString()); // b,True Or b,False for BluetoothDeviceConnection state
                 OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].IsConnected = mmSocket.IsConnected;
                 OpenGloveServer.OpenGloveByDeviceName[mmDeviceName].InitializeOpenGloveConfigurationOnDevice();
 
@@ -284,7 +288,7 @@ namespace OpenGloveApp.Droid.Bluetooth
 
                         if (line != null)
                         {
-                            //Debug.WriteLine($"from ConnectedThread {this.Id}, line: {line}");
+                            //Debug.WriteLine($"from Communication.ConnectedThread {this.Id}, line from BluetoothDevice: {line}");
                             //Raise the event to WebSocket Server, that need stay subscriber to this publisher thread
                             OnBluetoothDataReceived(this.Id, this.mmDeviceName, line);
                         }
@@ -305,117 +309,6 @@ namespace OpenGloveApp.Droid.Bluetooth
                         Debug.WriteLine($"CONNECTED THREAD {this.Id}: {e.Message}");
                     }
                 }
-            }
-
-            private void FlexorTest(int samples, int flexors, String folderName, String fileName)
-            {
-                // Keep listening to the InputStream whit a StreamReader until an exception occurs
-                string line;
-                int counter = 0;
-                List<long> latencies = new List<long>();
-                IO.CSV csvWriter = new IO.CSV(folderName, fileName);
-
-                Debug.WriteLine(csvWriter.ToString());
-
-                Stopwatch stopWatch = new Stopwatch(); // for capture elapsed time
-                TimeSpan ts;
-
-                while (true)
-                {
-                    try
-                    {
-                        Debug.WriteLine("Counter: " + counter);
-                        stopWatch = new Stopwatch();
-                        stopWatch.Start();
-                        line = AnalogRead(mFlexorPins[0]);
-                        stopWatch.Stop();
-                        ts = stopWatch.Elapsed;
-
-                        if (counter < samples)
-                        {
-                            latencies.Add(ts.Ticks * 100); // nanoseconds https://msdn.microsoft.com/en-us/library/system.datetime.ticks(v=vs.110).aspx
-                            if ((counter + 1) % 100 == 0) Debug.WriteLine("Counter: " + counter);
-                        }
-                        else
-                        {
-                            break;
-                        }
-                        counter++;
-
-                        if (line != null)
-                        {
-
-                            //Raise the event to UI thread, that need stay subscriber to this publisher thread
-                            //Send the current thread id and send Message
-                            OnBluetoothDataReceived(this.Id, this.mmDeviceName, line);
-                        }
-                        else
-                        {
-                            Debug.WriteLine($"BluetoothSocket is Disconnected");
-                            mmSocket.Connect();
-                        }
-                    }
-                    catch (Java.IO.IOException e)
-                    {
-                        Debug.WriteLine($"CONNECTED THREAD {this.Id}: {e.Message}");
-                    }
-                }
-
-                csvWriter.Write(latencies, "latencies-ns");
-                Debug.WriteLine(csvWriter.ToString());
-            }
-
-            private void MotorTest(int samples, int motors, string folderName, string fileName)
-            {
-                string message;
-                int counter = 0;
-                List<long> latencies = new List<long>();
-                List<int> pins = new List<int>(OpenGloveAppPage.mPins.GetRange(0, motors * 2));
-                List<string> valuesON = new List<string>(OpenGloveAppPage.mValuesON.GetRange(0, motors * 2));
-                List<string> valuesOFF = new List<string>(OpenGloveAppPage.mValuesOFF.GetRange(0, motors * 2));
-                IO.CSV csvWriter = new IO.CSV(folderName, fileName);
-
-                Debug.WriteLine(csvWriter.ToString());
-
-                Stopwatch stopWatch = new Stopwatch(); // for capture elapsed time
-                TimeSpan ts;
-
-                while (true)
-                {
-                    if (counter < samples)
-                    {
-                        try
-                        {
-                            stopWatch = new Stopwatch();
-                            stopWatch.Start();
-
-                            message = mMessageGenerator.ActivateMotor(pins, valuesON);
-                            this.Write(message); // Activate the motors
-
-                            message = mMessageGenerator.ActivateMotor(pins, valuesOFF);
-                            this.Write(message); // Disable the motors
-
-                            stopWatch.Stop();
-                            ts = stopWatch.Elapsed;
-
-                            latencies.Add(ts.Ticks * 100);
-                            if ((counter + 1) % 100 == 0) Debug.WriteLine("Counter: " + counter);
-                        }
-                        catch (Java.IO.IOException e)
-                        {
-                            e.PrintStackTrace();
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        break;
-                    }
-                    counter++;
-                }
-
-                csvWriter.Write(latencies, "latencies-ns");
-                Debug.WriteLine(csvWriter.ToString());
             }
 
             public string AnalogRead(int pin)

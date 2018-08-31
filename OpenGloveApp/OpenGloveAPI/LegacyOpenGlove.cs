@@ -61,6 +61,12 @@ namespace OpenGloveApp.OpenGloveAPI
             string message = messageGenerator.ActivateMotor(pins, values);
             communication.Write(message);
         }
+
+        public void ActivateMotorTimeTest(IEnumerable<int> pins, IEnumerable<string> values)
+        {
+            string message = messageGenerator.ActivateMotorTimeTest(pins, values);
+            communication.Write(message);
+        }
         /// <summary>
         /// Read the input buffet until a next line character
         /// </summary>

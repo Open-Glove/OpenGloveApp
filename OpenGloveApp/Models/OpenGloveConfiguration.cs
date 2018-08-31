@@ -20,7 +20,7 @@ namespace OpenGloveApp.Models
         public OpenGloveConfiguration()
         {
             this.Threshold = 0;
-            this.IMUStatus = true;
+            this.IMUStatus = false;
             this.IMUChoosingData = -1; //Get All Data Accelerometer, Gyroscope and Magnetometer
             this.IMURawData = false;
             this.LoopDelay = 60;
@@ -30,7 +30,7 @@ namespace OpenGloveApp.Models
         {
             this.Name = name;
             this.Threshold = 0;
-            this.IMUStatus = true;
+            this.IMUStatus = false;
             this.IMUChoosingData = -1; //Get All Data Accelerometer, Gyroscope and Magnetometer
             this.IMURawData = false;
             this.LoopDelay = 60;

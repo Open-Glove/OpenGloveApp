@@ -17,6 +17,7 @@
     <Folder Include="Extensions\" />
     <Folder Include="Pages\CustomListItem\" />
     <Folder Include="Utils\" />
+    <Folder Include="IO\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Pages\DevicePage.xaml.cs" />

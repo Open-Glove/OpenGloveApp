@@ -13,14 +13,14 @@ namespace OpenGloveApp.OpenGloveAPI
         public bool IsConnected { get; set; }
 
         public OpenGlove(string bluetoothDeviceName)
-            : base ()
+            : base()
         {
             this.BluetoothDeviceName = bluetoothDeviceName;
             this.Configuration = new OpenGloveConfiguration();
         }
 
         public OpenGlove(string bluetoothDeviceName, OpenGloveConfiguration configuration)
-            : base()    
+            : base()
         {
             this.BluetoothDeviceName = bluetoothDeviceName;
             this.Configuration = configuration;
@@ -45,6 +45,7 @@ namespace OpenGloveApp.OpenGloveAPI
             this.InitializeActuators();
             this.InitializeFlexors();
             this.InitializeIMU();
+            this.InitializeGlobalSettings();
         }
 
         public void InitializeActuators()
@@ -67,8 +68,9 @@ namespace OpenGloveApp.OpenGloveAPI
 
         public void InitializeFlexors()
         {
-            if(BooleanStatements.NoNullAndCountGreaterThanZero(this.Configuration.FlexorsByRegion))
+            if (BooleanStatements.NoNullAndCountGreaterThanZero(this.Configuration.FlexorsByRegion))
             {
+                this.SetThreshold(this.Configuration.Threshold);
                 foreach (var flexorByRegion in this.Configuration.FlexorsByRegion)
                 {
                     this.LegacyOpenGlove.addFlexor(flexorByRegion.Value, flexorByRegion.Key);
@@ -78,14 +80,18 @@ namespace OpenGloveApp.OpenGloveAPI
 
         public void InitializeIMU()
         {
-            if(this.Configuration != null)
+            if (this.Configuration != null)
             {
-                this.StartIMU();
-                this.SetThreshold(this.Configuration.Threshold);
-                this.SetIMUStatus(this.Configuration.IMUStatus);
-                this.SetIMUChoosingData(this.Configuration.IMUChoosingData);
-                this.SetLoopDelay(this.Configuration.LoopDelay);
+                this.LegacyOpenGlove.startIMU();
+                this._SetIMUStatus(this.Configuration.IMUStatus);
+                this._SetRawData(this.Configuration.IMURawData);
+                this.LegacyOpenGlove.setChoosingData(this.Configuration.IMUChoosingData);
             }
+        }
+
+        public void InitializeGlobalSettings()
+        {
+            this.LegacyOpenGlove.setLoopDelay(this.Configuration.LoopDelay);
         }
 
         public void AddActuator(int region, int positivePin, int negativePin)
@@ -97,13 +103,13 @@ namespace OpenGloveApp.OpenGloveAPI
                     PositivePin = positivePin,
                     NegativePin = negativePin
                 });
-                InitializeActuators();
+                //InitializeActuators();
             }
         }
 
         public void AddActuators(List<int> regions, List<int> positivePins, List<int> negativePins)
         {
-            bool added = false;
+            //bool added = false;
             if(BooleanStatements.NoNullAndEqualCount(regions, positivePins, negativePins))
             {
                 for (int i = 0; i < regions.Count; i++ )
@@ -115,12 +121,12 @@ namespace OpenGloveApp.OpenGloveAPI
                             PositivePin = positivePins[i],
                             NegativePin = negativePins[i]
                         });
-                        added = true;
+                        //added = true;
                     }
 
                 }
-                if(added)
-                    InitializeActuators();
+                //if(added)
+                  //InitializeActuators();
             }
         }
 
@@ -154,6 +160,21 @@ namespace OpenGloveApp.OpenGloveAPI
                 }
 
                 this.LegacyOpenGlove.ActivateMotor(positivePins, intensities);
+            }
+        }
+
+        public void ActivateActuatorsTimeTest(List<int> regions, List<string> intensities)
+        {
+            if (BooleanStatements.NoNullAndEqualCount(regions, intensities))
+            {
+                List<int> positivePins = new List<int>();
+
+                foreach (int region in regions)
+                {
+                    positivePins.Add(this.Configuration.ActuatorsByRegion[region].PositivePin);
+                }
+
+                this.LegacyOpenGlove.ActivateMotorTimeTest(positivePins, intensities);
             }
         }
 
@@ -206,7 +227,7 @@ namespace OpenGloveApp.OpenGloveAPI
             if (!Configuration.FlexorsByRegion.ContainsKey(region))
             {
                 Configuration.FlexorsByRegion.Add(region, pin);
-                this.LegacyOpenGlove.addFlexor(pin, region);
+                //this.LegacyOpenGlove.addFlexor(pin, region);
             }
         }
 
@@ -219,7 +240,7 @@ namespace OpenGloveApp.OpenGloveAPI
                     if (!Configuration.FlexorsByRegion.ContainsKey(regions[i]))
                     {
                         Configuration.FlexorsByRegion.Add(regions[i], pins[i]);
-                        this.LegacyOpenGlove.addFlexor(pins[i], regions[i]);   
+                        //this.LegacyOpenGlove.addFlexor(pins[i], regions[i]);   
                     }
                 }
             }
@@ -252,7 +273,7 @@ namespace OpenGloveApp.OpenGloveAPI
 
         public void SetThreshold(int value)
         {
-            this.LegacyOpenGlove.setThreshold(value);
+            this.Configuration.Threshold = value;
         }
 
         public void TurnOnFlexors()
@@ -281,21 +302,31 @@ namespace OpenGloveApp.OpenGloveAPI
 
         public void SetIMUStatus(bool status)
         {
+            this.Configuration.IMUStatus = status;
+        }
+
+        private void _SetIMUStatus(bool status)
+        {
             int integerStatus = (status) ? 1 : 0;
             this.LegacyOpenGlove.setIMUStatus(integerStatus);
         }
 
         public void TurnOnIMU()
         {
-            this.SetIMUStatus(true);
+            this._SetIMUStatus(true);
         }
 
         public void TurnOffIMU()
         {
-            this.SetIMUStatus(false);
+            this._SetIMUStatus(false);
         }
 
         public void SetRawData(bool status)
+        {
+            this.Configuration.IMURawData = status;
+        }
+
+        private void _SetRawData(bool status)
         {
             int integerStatus = (status) ? 1 : 0;
             this.LegacyOpenGlove.setRawData(integerStatus);
@@ -303,25 +334,22 @@ namespace OpenGloveApp.OpenGloveAPI
 
         public void SetIMUChoosingData(int value)
         {
-            this.LegacyOpenGlove.setChoosingData(value);
+            this.Configuration.IMUChoosingData = value;
         }
 
         public void SetLoopDelay(int value)
         {
-            this.LegacyOpenGlove.setLoopDelay(value);
+            this.Configuration.LoopDelay = value;
         }
 
         public List<BluetoothDevices> GetAllPairedDevices()
         {
-            // TODO this need await a async method
             return this.LegacyOpenGlove.communication.GetAllPairedDevices();
         }
 
         public void OpenDeviceConnection()
         {
             this.LegacyOpenGlove.communication.OpenDeviceConnection(this.BluetoothDeviceName);
-            //TODO this need await  bool OpenDeviceConnection()
-            this.IsConnected = true;
         }
 
         public void CloseDeviceConnection()
@@ -329,8 +357,7 @@ namespace OpenGloveApp.OpenGloveAPI
             this.TurnOffFlexors();
             this.TurnOffActuators();
             this.TurnOffIMU();
-            this.LegacyOpenGlove.communication.CloseDeviceConnection(); //TODO this need await bool CloseDeviceConnection()
-            this.IsConnected = false;
+            this.LegacyOpenGlove.communication.CloseDeviceConnection();
         }
 
         public void GetOpenGloveArduinoSofwareVersion()

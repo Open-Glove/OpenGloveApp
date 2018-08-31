@@ -66,11 +66,12 @@ namespace OpenGloveApp.AppConstants
         RemoveActuator,
         RemoveActuators,
         ActivateActuators,
+        ActivateActuatorsTimeTest,
         TurnOnActuators,
         TurnOffActuators,
         ResetActuators,
 
-        AddFlexor = 19,
+        AddFlexor = 20,
         AddFlexors,
         RemoveFlexor,
         RemoveFlexors,
@@ -81,7 +82,7 @@ namespace OpenGloveApp.AppConstants
         TurnOffFlexors,
         ResetFlexors,
 
-        StartIMU = 29,
+        StartIMU = 30,
         SetIMUStatus,
         SetRawData,
         SetIMUChoosingData,
@@ -91,8 +92,10 @@ namespace OpenGloveApp.AppConstants
         ReadOnlyAttitudeFromIMU,
         ReadAllDataFromIMU,
         CalibrateIMU,
+        TurnOnIMU,
+        TurnOffIMU,
 
-        SetLoopDelay = 39,
+        SetLoopDelay = 42,
 
         GetOpenGloveArduinoSoftwareVersion = 99,
     }

@@ -20,6 +20,9 @@ namespace OpenGloveApp.Server
         public static Dictionary<string, OpenGloveConfiguration> ConfigurationByName = new Dictionary<string, OpenGloveConfiguration>();
         //public static Dictionary<string, OpenGloveConfiguration> ConfigurationByDeviceName = new Dictionary<string, OpenGloveConfiguration>();
 
+        //For Actuators Activation for Latency Time Test
+        private Stopwatch stopwatch;
+        private TimeSpan timeSpan;
 
         public OpenGloveServer(string url)
         {
@@ -149,8 +152,6 @@ namespace OpenGloveApp.Server
                 switch (what)
                 {
                     case (int)OpenGloveActions.StartOpenGlove:
-                        Value = values;
-                        LoadConfigurationToOpenGloveInstance(deviceName, Value);
                         InitializeOpenGloveConfigurationOnDevice(deviceName);
                         break;
 
@@ -159,7 +160,8 @@ namespace OpenGloveApp.Server
                         break;
 
                     case (int)OpenGloveActions.AddOpenGloveDeviceToServer:
-                        AddOpenGloveDeviceToServer(deviceName);
+                        Value = values;
+                        AddOpenGloveDeviceToServer(deviceName, Value);
                         break;
 
                     case (int)OpenGloveActions.RemoveOpenGloveDeviceFromServer:
@@ -215,6 +217,20 @@ namespace OpenGloveApp.Server
                         Regions = regions.Split(',').Select(int.Parse).ToList();
                         Intensities = values.Split(',').ToList();
                         OpenGloveByDeviceName[deviceName].ActivateActuators(Regions, Intensities);
+                        break;
+
+                    case (int)OpenGloveActions.ActivateActuatorsTimeTest:
+                        //Send elapsed time on OpenGlove Configuration Application
+                        stopwatch = new Stopwatch();
+                        stopwatch.Start();
+
+                        Regions = regions.Split(',').Select(int.Parse).ToList();
+                        Intensities = values.Split(',').ToList();
+                        OpenGloveByDeviceName[deviceName].ActivateActuatorsTimeTest(Regions, Intensities);
+
+                        stopwatch.Stop();
+                        timeSpan = stopwatch.Elapsed;
+                        webSocketByDeviceName[deviceName].Send("ns," + timeSpan.Ticks * 100); // nanoseconds https://msdn.microsoft.com/en-us/library/system.datetime.ticks(v=vs.110).aspx
                         break;
 
                     case (int)OpenGloveActions.TurnOnActuators:
@@ -299,6 +315,14 @@ namespace OpenGloveApp.Server
                         socket.Send("[OpenGloveServer] CalibrateIMU: Not Implemented");
                         break;
 
+                    case (int)OpenGloveActions.TurnOnIMU:
+                        OpenGloveByDeviceName[deviceName].TurnOnIMU();
+                        break;
+
+                    case (int)OpenGloveActions.TurnOffIMU:
+                        OpenGloveByDeviceName[deviceName].TurnOffIMU();
+                        break;
+
                     case (int)OpenGloveActions.SetLoopDelay:
                         Value = values.Split(',')[0];
                         OpenGloveByDeviceName[deviceName].SetLoopDelay(Int32.Parse(Value));
@@ -334,12 +358,13 @@ namespace OpenGloveApp.Server
             }
         }
 
-        public bool AddOpenGloveDeviceToServer(string deviceName)
+        public bool AddOpenGloveDeviceToServer(string deviceName, string configurationName)
         {
             if (!OpenGloveByDeviceName.ContainsKey(deviceName))
             {
                 OpenGlove openGlove = new OpenGlove(deviceName);
                 OpenGloveByDeviceName.Add(openGlove.BluetoothDeviceName, openGlove);
+                LoadConfigurationToOpenGloveInstance(deviceName, configurationName);
                 return true;
             }
             return false;
@@ -377,7 +402,8 @@ namespace OpenGloveApp.Server
         public void InitializeOpenGloveConfigurationOnDevice(string deviceName)
         {
             if(deviceName != null)
-                OpenGloveByDeviceName[deviceName].InitializeOpenGloveConfigurationOnDevice(); //equals to .InitializeActuators, .InitializeFlexors and .InitializeIMU
+                if(OpenGloveByDeviceName.ContainsKey(deviceName))
+                    OpenGloveByDeviceName[deviceName].InitializeOpenGloveConfigurationOnDevice(); //equals to .InitializeActuators, .InitializeFlexors and .InitializeIMU
         }
 
         public void SaveOpenGloveConfiguration(string deviceName, string configurationName)
