@@ -28,24 +28,24 @@ namespace OpenGloveApp.OpenGloveAPI
 
         public void TurnOnAllOpenGloveComponents()
         {
-            this.TurnOnActuators();
-            this.TurnOnFlexors();
             this.TurnOnIMU();
+            this.TurnOnFlexors();
+            this.TurnOnActuators();
         }
 
         public void TurnOffAllOpenGloveComponents()
         {
-            this.TurnOffActuators();
-            this.TurnOffFlexors();
             this.TurnOffIMU();
+            this.TurnOffFlexors();
+            this.TurnOffActuators();
         }
 
         public void InitializeOpenGloveConfigurationOnDevice()
         {
+            this.InitializeGlobalSettings();
+            this.InitializeIMU();
             this.InitializeActuators();
             this.InitializeFlexors();
-            this.InitializeIMU();
-            this.InitializeGlobalSettings();
         }
 
         public void InitializeActuators()
@@ -283,10 +283,7 @@ namespace OpenGloveApp.OpenGloveAPI
 
         public void TurnOffFlexors()
         {
-            foreach (var entry in Configuration.FlexorsByRegion)
-            {
-                this.LegacyOpenGlove.removeFlexor(entry.Key);
-            }
+            this.LegacyOpenGlove.resetFlexors();
         }
 
         public void ResetFlexors()

@@ -92,7 +92,7 @@ namespace OpenGloveApp.OpenGloveAPI
         /// </summary>
         private string setLoopDelayNumber = "0";
 
-        private string getOpenGloveArduinoSoftwareVersionFunctionNumber = "99";
+        private string getOpenGloveArduinoSoftwareVersionFunctionNumber = "43";
 
 
         /// <summary>

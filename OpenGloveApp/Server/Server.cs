@@ -1,9 +1,9 @@
 ﻿namespace OpenGloveApp.Server
 {
-    abstract public class Server
+    public interface IServer
     {
-        abstract public void Stop();
-        abstract public void Start();
-        abstract public void ConfigureServer();
+        void Stop();
+        void Start();
+        void ConfigureServer();
     }
 }

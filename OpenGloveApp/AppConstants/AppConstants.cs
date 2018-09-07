@@ -96,8 +96,7 @@ namespace OpenGloveApp.AppConstants
         TurnOffIMU,
 
         SetLoopDelay = 42,
-
-        GetOpenGloveArduinoSoftwareVersion = 99,
+        GetOpenGloveArduinoSoftwareVersion,
     }
 
     public enum PalmarRegion

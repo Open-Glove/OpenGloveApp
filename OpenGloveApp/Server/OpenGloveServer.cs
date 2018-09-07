@@ -9,7 +9,7 @@ using OpenGloveApp.OpenGloveAPI;
 
 namespace OpenGloveApp.Server
 {
-    public class OpenGloveServer: Server
+    public class OpenGloveServer: IServer
     {
         private string Url { get; set; }
         private WebSocketServer Server; // sample "ws://127.0.0.1:7070"
@@ -69,21 +69,21 @@ namespace OpenGloveApp.Server
             AllSockets.ToList().ForEach(s => s.Close());
         }
 
-        override public void Start()
+        public void Start()
         {
             this.Server = new WebSocketServer(Url);
             ConfigureServer();
             StartWebsockerServer();
         }
 
-        override public void Stop()
+        public void Stop()
         {
             CloseAllSockets();
             Server.Dispose(); //this method does not allow more incoming connections, and disconnect the server. So it is necessary to disconnect all sockets first to cut off all communication
             AllSockets.Clear();
         }
 
-        override public void ConfigureServer()
+        public void ConfigureServer()
         {
             Server.RestartAfterListenError = true;
         }
@@ -360,11 +360,19 @@ namespace OpenGloveApp.Server
 
         public bool AddOpenGloveDeviceToServer(string deviceName, string configurationName)
         {
-            if (!OpenGloveByDeviceName.ContainsKey(deviceName))
+            if (OpenGloveByDeviceName !=null )
             {
-                OpenGlove openGlove = new OpenGlove(deviceName);
-                OpenGloveByDeviceName.Add(openGlove.BluetoothDeviceName, openGlove);
-                LoadConfigurationToOpenGloveInstance(deviceName, configurationName);
+                if (OpenGloveByDeviceName.ContainsKey(deviceName))
+                {
+                    LoadConfigurationToOpenGloveInstance(deviceName, configurationName);
+                }
+                else
+                {
+                    OpenGlove openGlove = new OpenGlove(deviceName);
+                    OpenGloveByDeviceName.Add(openGlove.BluetoothDeviceName, openGlove);
+                    LoadConfigurationToOpenGloveInstance(deviceName, configurationName);
+                }
+
                 return true;
             }
             return false;
