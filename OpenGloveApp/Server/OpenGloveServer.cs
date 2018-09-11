@@ -15,7 +15,7 @@ namespace OpenGloveApp.Server
         private WebSocketServer Server; // sample "ws://127.0.0.1:7070"
         private List<IWebSocketConnection> AllSockets = new List<IWebSocketConnection>();
         private static Dictionary<string, IWebSocketConnection> webSocketByDeviceName = new Dictionary<string, IWebSocketConnection>();
-        public static Dictionary<string, OpenGlove> OpenGloveByDeviceName = new Dictionary<string, OpenGlove>();
+        public static Dictionary<string, OpenGloveDevice> OpenGloveByDeviceName = new Dictionary<string, OpenGloveDevice>();
 
         public static Dictionary<string, OpenGloveConfiguration> ConfigurationByName = new Dictionary<string, OpenGloveConfiguration>();
         //public static Dictionary<string, OpenGloveConfiguration> ConfigurationByDeviceName = new Dictionary<string, OpenGloveConfiguration>();
@@ -135,6 +135,7 @@ namespace OpenGloveApp.Server
         }
 
         // For add news actions on OpenGloveServer
+        // TODO refactor: Use a Separated File
         public void SwitchOpenGloveActions(IWebSocketConnection socket, string message, int what, string deviceName, string regions, string values, string extraValues)
         {
             int Region = -1;
@@ -311,6 +312,26 @@ namespace OpenGloveApp.Server
                         OpenGloveByDeviceName[deviceName].SetIMUChoosingData(IntegerValue);
                         break;
 
+                    case (int)OpenGloveActions.ReadOnlyAccelerometerFromIMU:
+                        OpenGloveByDeviceName[deviceName].ReadOnlyAccelerometerFromIMU();
+                        break;
+
+                    case (int)OpenGloveActions.ReadOnlyGyroscopeFromIMU:
+                        OpenGloveByDeviceName[deviceName].ReadOnlyGyroscopeFromIMU();
+                        break;
+
+                    case (int)OpenGloveActions.ReadOnlyMagnetometerFromIMU:
+                        OpenGloveByDeviceName[deviceName].ReadOnlyMagnetometerFromIMU();
+                        break;
+
+                    case (int)OpenGloveActions.ReadOnlyAttitudeFromIMU:
+                        OpenGloveByDeviceName[deviceName].ReadOnlyAttitudeFromIMU();
+                        break;
+
+                    case (int)OpenGloveActions.ReadAllDataFromIMU:
+                        OpenGloveByDeviceName[deviceName].ReadAllDataFromIMU();
+                        break;
+
                     case (int)OpenGloveActions.CalibrateIMU:
                         socket.Send("[OpenGloveServer] CalibrateIMU: Not Implemented");
                         break;
@@ -368,7 +389,7 @@ namespace OpenGloveApp.Server
                 }
                 else
                 {
-                    OpenGlove openGlove = new OpenGlove(deviceName);
+                    OpenGloveDevice openGlove = new OpenGloveDevice(deviceName);
                     OpenGloveByDeviceName.Add(openGlove.BluetoothDeviceName, openGlove);
                     LoadConfigurationToOpenGloveInstance(deviceName, configurationName);
                 }
@@ -411,7 +432,7 @@ namespace OpenGloveApp.Server
         {
             if(deviceName != null)
                 if(OpenGloveByDeviceName.ContainsKey(deviceName))
-                    OpenGloveByDeviceName[deviceName].InitializeOpenGloveConfigurationOnDevice(); //equals to .InitializeActuators, .InitializeFlexors and .InitializeIMU
+                    OpenGloveByDeviceName[deviceName].InitializeOpenGloveConfigurationOnDevice();
         }
 
         public void SaveOpenGloveConfiguration(string deviceName, string configurationName)
@@ -450,7 +471,7 @@ namespace OpenGloveApp.Server
             {
                 if (OpenGloveByDeviceName.ContainsKey(deviceName))
                 {
-                    OpenGloveByDeviceName[deviceName].TurnOffActuators(); //TODO await turn off before CloseConnection
+                    OpenGloveByDeviceName[deviceName].TurnOffActuators();
                     OpenGloveByDeviceName[deviceName].CloseDeviceConnection();
                     return true;
                 }

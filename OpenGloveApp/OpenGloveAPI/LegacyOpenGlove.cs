@@ -19,30 +19,6 @@ namespace OpenGloveApp.OpenGloveAPI
         public MessageGenerator messageGenerator = new MessageGenerator();
 
         /// <summary>
-        /// Open the communication with the port and baudrate specified
-        /// </summary>
-        ///<param name = "portName" > Name of the serial port to open a communication</param>
-        /// <param name="baudRate">Data rate in bits per second. Use one of these values: 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, or 115200</param>
-        public void OpenPort(string portName, int baudRate)
-        {
-            communication.OpenPort(portName, baudRate);
-        }
-        /// <summary>
-        /// Close the current active serial communication
-        /// </summary>
-        public void ClosePort()
-        {
-            communication.ClosePort();
-        }
-        /// <summary>
-        /// List all active serial ports names
-        /// </summary>
-        /// <returns>An array with the names of all active serial ports</returns>
-        public string[] GetPortNames()
-        {
-            return communication.GetPortNames();
-        }
-        /// <summary>
         /// Initialize pins like motors in the control software
         /// </summary>
         /// <param name="pins">List of pins that  are initialized</param>
@@ -169,7 +145,6 @@ namespace OpenGloveApp.OpenGloveAPI
         {
             string message = messageGenerator.AnalogWrite(pins, values);
             communication.Write(message);
-
         }
 
         /// <summary>
@@ -192,7 +167,6 @@ namespace OpenGloveApp.OpenGloveAPI
             string message = messageGenerator.removeFlexor(mapping);
             communication.Write(message);
         }
-        //calibrateFlexors()
 
         /// <summary>
         ///  

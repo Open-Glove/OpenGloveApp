@@ -34,7 +34,7 @@ namespace OpenGloveApp.Pages
                     break;
 
                 case Device.Android:
-                    var devices = Home.OpenGlove.GetAllPairedDevices();
+                    var devices = Home.OpenGloveDevice.GetAllPairedDevices();
                     if (devices != null)
                         if(devices.Count > 0)
                             listViewBoundedDevices.ItemsSource = devices;
@@ -63,7 +63,7 @@ namespace OpenGloveApp.Pages
             {
                 //TODO call the config asociate to this OpenGlove device if exist in this Page
                 OpenGloveConfiguration openGloveConfiguration = new OpenGloveConfiguration(); //load config
-                OpenGlove openGlove = new OpenGlove(device.Name, openGloveConfiguration);
+                OpenGloveDevice openGlove = new OpenGloveDevice(device.Name, openGloveConfiguration);
 
                 if(!OpenGloveServer.OpenGloveByDeviceName.ContainsKey(device.Name))
                     OpenGloveServer.OpenGloveByDeviceName.Add(device.Name, openGlove);

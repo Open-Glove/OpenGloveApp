@@ -5,21 +5,21 @@ using Xamarin.Forms;
 
 namespace OpenGloveApp.OpenGloveAPI
 {
-    public class OpenGlove
+    public class OpenGloveDevice
     {
         public string BluetoothDeviceName { get; set; }
         public OpenGloveConfiguration Configuration { get; set; }
         public LegacyOpenGlove LegacyOpenGlove = new LegacyOpenGlove();
         public bool IsConnected { get; set; }
 
-        public OpenGlove(string bluetoothDeviceName)
+        public OpenGloveDevice(string bluetoothDeviceName)
             : base()
         {
             this.BluetoothDeviceName = bluetoothDeviceName;
             this.Configuration = new OpenGloveConfiguration();
         }
 
-        public OpenGlove(string bluetoothDeviceName, OpenGloveConfiguration configuration)
+        public OpenGloveDevice(string bluetoothDeviceName, OpenGloveConfiguration configuration)
             : base()
         {
             this.BluetoothDeviceName = bluetoothDeviceName;
@@ -83,9 +83,9 @@ namespace OpenGloveApp.OpenGloveAPI
             if (this.Configuration != null)
             {
                 this.LegacyOpenGlove.startIMU();
-                this._SetIMUStatus(this.Configuration.IMUStatus);
+                this._SetIMUChoosingData(this.Configuration.IMUChoosingData);
                 this._SetRawData(this.Configuration.IMURawData);
-                this.LegacyOpenGlove.setChoosingData(this.Configuration.IMUChoosingData);
+                this._SetIMUStatus(this.Configuration.IMUStatus);
             }
         }
 
@@ -329,9 +329,39 @@ namespace OpenGloveApp.OpenGloveAPI
             this.LegacyOpenGlove.setRawData(integerStatus);
         }
 
+        private void _SetIMUChoosingData(int value)
+        {
+            this.LegacyOpenGlove.setChoosingData(value);
+        }
+
         public void SetIMUChoosingData(int value)
         {
             this.Configuration.IMUChoosingData = value;
+        }
+
+        public void ReadOnlyAccelerometerFromIMU()
+        {
+            this._SetIMUChoosingData(0);
+        }
+
+        public void ReadOnlyGyroscopeFromIMU()
+        {
+            this._SetIMUChoosingData(1);
+        }
+
+        public void ReadOnlyMagnetometerFromIMU()
+        {
+            this._SetIMUChoosingData(2);
+        }
+
+        public void ReadOnlyAttitudeFromIMU()
+        {
+            this._SetIMUChoosingData(3);
+        }
+
+        public void ReadAllDataFromIMU()
+        {
+            this._SetIMUChoosingData(-1);
         }
 
         public void SetLoopDelay(int value)

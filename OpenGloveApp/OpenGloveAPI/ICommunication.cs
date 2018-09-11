@@ -22,30 +22,7 @@ namespace OpenGloveApp.OpenGloveAPI
         /// <param name="bluetoothDevice"> The device to connect </param>
         void OpenDeviceConnection(string bluetoothDeviceName);
         void CloseDeviceConnection();
-        /// <summary>
-        /// Returns an array with all active serial ports names
-        /// </summary>
-        /// <returns>An array with the names of all active serial ports</returns>
-        string[] GetPortNames();
-        /// <summary>
-        /// Open a new connection with the specified port and baud rate
-        /// </summary>
-        ///<param name = "portName" >Name of the serial port to open a communication</param>
-        /// <param name="baudRate">Data rate in bits per second. Use one of these values: 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, or 115200</param>
-        void OpenPort(string portName, int baudRate);
-        /// <summary>
-        /// Send the string to the serial port
-        /// </summary>
-        /// <param name="data">String data to send</param>
         void Write(string message);
-        /// <summary>
-        /// Read the input buffet until a next line character
-        /// </summary>
-        /// <returns>A string without the next line character</returns>
         string ReadLine();
-        /// <summary>
-        /// Close the serial communication
-        /// </summary>
-        void ClosePort();
     }
 }

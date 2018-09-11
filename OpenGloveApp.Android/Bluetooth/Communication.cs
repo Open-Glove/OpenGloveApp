@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -21,7 +20,6 @@ namespace OpenGloveApp.Droid.Bluetooth
         private BluetoothAdapter mBluetoothAdapter;
         private BluetoothDevice mDevice;
         private List<BluetoothDevices> mBoundedDevicesModel;
-        //private Hashtable mBoundedDevices = new Hashtable();
         private Dictionary<string, BluetoothDevice> mBoundedDeviceByDeviceName = new Dictionary<string, BluetoothDevice>();
         private static ConnectedThread mBluetoothManagementThread;
 

@@ -42,7 +42,7 @@ namespace OpenGloveApp
         public List<int> mFlexorMapping = new List<int> { 8 }; //values of 0 to 10 for flexor mapping
         public List<string> mFlexorPinsMode = new List<string> { "OUTPUT" };
 
-        public OpenGlove mOpenGlove = new OpenGlove("OpenGloveIZQ");
+        public OpenGloveDevice mOpenGlove = new OpenGloveDevice("OpenGloveIZQ");
 
         public OpenGloveAppPage()
         {
