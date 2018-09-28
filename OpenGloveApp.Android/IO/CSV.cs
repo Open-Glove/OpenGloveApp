@@ -1,28 +1,27 @@
 ﻿using System.Collections.Generic;
 using Android.OS;
 using Java.IO;
+using OpenGloveApp.Droid.IO;
+using OpenGloveApp.IO;
 
+[assembly: Xamarin.Forms.Dependency(typeof(CSV))]
 namespace OpenGloveApp.Droid.IO
 {
-    public class CSV
-    {   
-        public string mFolderName;
-        public string mFileName;
-        public string mExternalStoragePath;
+    public class CSV : ICSV
+    {
+        public string FolderName { get; set; }
+        public string FileName { get; set; }
+        public string ExternalStoragePath { get; set; }
 
-        public CSV(string mFolderName, string mFileName)
-        {
-            this.mFolderName = mFolderName;
-            this.mFileName = mFileName;
-        }
-
-        public void Write(List<long> values, string columnTitle)
+        public string Write(string folderName, string fileName, string columnTitle, List<long> values)
         {
             try
             {
-                
+                FolderName = folderName;
+                FileName = fileName;
+
                 File folder = new File(Environment.ExternalStorageDirectory
-                        + "/" + mFolderName);
+                        + "/" + FolderName);
 
                 bool success = true;
                 if (!folder.Exists())
@@ -30,8 +29,8 @@ namespace OpenGloveApp.Droid.IO
 
                 if (success)
                 {
-                    string pathName = folder + "/" + mFileName; //TODO folder.ToString() ?
-                    mExternalStoragePath = pathName;
+                    string pathName = folder + "/" + fileName;
+                    ExternalStoragePath = pathName;
 
                     PrintWriter pw = new PrintWriter(new File(pathName));
                     pw.Write(columnTitle + '\n');
@@ -41,11 +40,14 @@ namespace OpenGloveApp.Droid.IO
                         pw.Write(value.ToString() + '\n');
                     }
                     pw.Close();
-                    System.Diagnostics.Debug.WriteLine("done!");
+                    System.Diagnostics.Debug.WriteLine("Save file is done!");
+                    System.Diagnostics.Debug.WriteLine(this.GetStorageInfo());
+
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("Folder no created");
+                    System.Diagnostics.Debug.WriteLine("Folder no created, please enable WriteExternalStorage permission");
+                    System.Diagnostics.Debug.WriteLine(this.GetStorageInfo());
                 }
 
             }
@@ -53,13 +55,15 @@ namespace OpenGloveApp.Droid.IO
             {
                 e.PrintStackTrace();
             }
+
+            return (this.ExternalStoragePath);
         }
 
-        override
-        public string ToString(){
-            return "FolderName: " + mFolderName +
-                "\nFileName: " + mFileName +
-                "\nExternal StoragePath:" + mExternalStoragePath;
+        private string GetStorageInfo()
+        {
+            return "FolderName: " + FolderName +
+                "\nFileName: " + FileName +
+                "\nExternal StoragePath:" + ExternalStoragePath;
         }
     }
 }

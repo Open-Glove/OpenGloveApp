@@ -8,10 +8,23 @@ namespace OpenGloveApp.Pages
     public partial class ServerPage : ContentPage
     {
         public static OpenGloveServer OpenGloveServer;
+        /*  TODO future work: Add a logger for all Messages 
+         *      - Support Turn On and Off logger, clear logger
+         *      - Support Filter logger: 
+         *          - all messages sended an received
+         *          - only flexors messages
+         *          - only IMU messages
+         *          - only Commands from Clients (activate actuators, add flexor, remove actuator, etc.)
+         */
 
         public ServerPage()
         {
             InitializeComponent();
+        }
+
+        void Handle_Activated(object sender, System.EventArgs e)
+        {
+            DisplayAlert("Settings Activated", "Your pressed: " + ((ToolbarItem)sender).Text, "OK");
         }
 
         void Switcher_Toogled(object sender, ToggledEventArgs e)
@@ -38,7 +51,7 @@ namespace OpenGloveApp.Pages
             {
                 instancedServer = false;
                 Debug.WriteLine("FormatException: " + formatException.Message);
-                DisplayAlert("Error", "Example server End Point: \n ws://127.0.0.1:7171", "OK");
+                DisplayAlert("Error", "Example server End Point: \n ws://127.0.0.1:7070", "OK");
             }
 
             if (instancedServer)

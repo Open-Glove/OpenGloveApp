@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackOnBuild>true</PackOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="OpenGloveAPI_HL\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="DataReceiver.cs" />
+  </ItemGroup>
+</Project>

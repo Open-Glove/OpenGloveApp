@@ -1,4 +1,5 @@
 ﻿using BottomBar.XamarinForms;
+using OpenGloveApp.Models;
 using OpenGloveApp.OpenGloveAPI;
 using Xamarin.Forms;
 using static OpenGloveApp.AppConstants.AppConstants;
@@ -8,12 +9,12 @@ namespace OpenGloveApp.Pages
    
     public partial class Home : BottomBarPage
     {
-        public static OpenGlove OpenGlove = new OpenGlove();
+        // For manage the current OpenGlove Bluetooth Device Configuration
+        public static OpenGloveDevice OpenGloveDevice = new OpenGloveDevice("ForConfigurationApplicationUse");
 
         public Home()
         {
             InitializeComponent();
-
             switch(DeviceRuntime)
             {
                 case Device_Android:

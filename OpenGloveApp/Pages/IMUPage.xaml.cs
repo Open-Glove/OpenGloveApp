@@ -11,5 +11,10 @@ namespace OpenGloveApp.Pages
         {
             InitializeComponent();
         }
+
+        void Handle_Activated(object sender, System.EventArgs e)
+        {
+            DisplayAlert("Settings Activated", "Your pressed: " + ((ToolbarItem)sender).Text, "OK");
+        }
     }
 }

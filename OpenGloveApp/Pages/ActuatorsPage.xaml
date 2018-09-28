@@ -3,6 +3,12 @@
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Class="OpenGloveApp.Pages.ActuatorsPage">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem x:Name="ToolbarItemTest" Text="Test" Activated="Handle_Activated"/>
+        <ToolbarItem x:Name="ToolbarItemSave" Icon="ic_save" Text="Save" Activated="Handle_Activated"/>
+    </ContentPage.ToolbarItems>
+    
     <ContentPage.Content>
         <Label x:Name="page_description" 
                HorizontalOptions="Center"

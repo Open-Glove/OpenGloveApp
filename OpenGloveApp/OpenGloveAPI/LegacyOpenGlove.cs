@@ -12,36 +12,12 @@ namespace OpenGloveApp.OpenGloveAPI
         /// <summary>
         /// An OpenGlove communication module instance.
         /// </summary>
-        ICommunication communication = DependencyService.Get<ICommunication>();
+        public ICommunication communication = DependencyService.Get<ICommunication>();
         /// <summary>
         /// An OpenGlove message generator module instance.
         /// </summary>
-        MessageGenerator messageGenerator = new MessageGenerator();
+        public MessageGenerator messageGenerator = new MessageGenerator();
 
-        /// <summary>
-        /// Open the communication with the port and baudrate specified
-        /// </summary>
-        ///<param name = "portName" > Name of the serial port to open a communication</param>
-        /// <param name="baudRate">Data rate in bits per second. Use one of these values: 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, or 115200</param>
-        public void OpenPort(string portName, int baudRate)
-        {
-            communication.OpenPort(portName, baudRate);
-        }
-        /// <summary>
-        /// Close the current active serial communication
-        /// </summary>
-        public void ClosePort()
-        {
-            communication.ClosePort();
-        }
-        /// <summary>
-        /// List all active serial ports names
-        /// </summary>
-        /// <returns>An array with the names of all active serial ports</returns>
-        public string[] GetPortNames()
-        {
-            return communication.GetPortNames();
-        }
         /// <summary>
         /// Initialize pins like motors in the control software
         /// </summary>
@@ -59,6 +35,12 @@ namespace OpenGloveApp.OpenGloveAPI
         public void ActivateMotor(IEnumerable<int> pins, IEnumerable<string> values)
         {
             string message = messageGenerator.ActivateMotor(pins, values);
+            communication.Write(message);
+        }
+
+        public void ActivateMotorTimeTest(IEnumerable<int> pins, IEnumerable<string> values)
+        {
+            string message = messageGenerator.ActivateMotorTimeTest(pins, values);
             communication.Write(message);
         }
         /// <summary>
@@ -163,7 +145,6 @@ namespace OpenGloveApp.OpenGloveAPI
         {
             string message = messageGenerator.AnalogWrite(pins, values);
             communication.Write(message);
-
         }
 
         /// <summary>
@@ -186,7 +167,6 @@ namespace OpenGloveApp.OpenGloveAPI
             string message = messageGenerator.removeFlexor(mapping);
             communication.Write(message);
         }
-        //calibrateFlexors()
 
         /// <summary>
         ///  
@@ -267,13 +247,19 @@ namespace OpenGloveApp.OpenGloveAPI
             communication.Write(message);
         }
 
-        public List<BluetoothDevices> GetAllPairedDevices()
+        /// <summary>
+        ///  
+        /// </summary>
+        /// <param name="value"></param>
+        public void setChoosingData(int value)
         {
-            return communication.GetAllPairedDevices();
+            string message = messageGenerator.setChoosingData(value);
+            communication.Write(message);
         }
 
-        public void OpenDeviceConnection(ContentPage contentPage, BluetoothDevices bluetoothDevice){
-            communication.OpenDeviceConnection(contentPage, bluetoothDevice);
+        public void GetOpenGloveArduinoSoftwareVersion(){
+            string message = messageGenerator.getOpenGloveArduinoSoftwareVersion();
+            communication.Write(message);
         }
     }
 }
