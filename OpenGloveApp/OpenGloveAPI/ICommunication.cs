@@ -11,18 +11,21 @@ namespace OpenGloveApp.OpenGloveAPI
     /// </summary>
     public interface ICommunication
     {
-        /// <summary>
-        /// Returns an list with all paired BluetoothDevices (Name and MAC direction)
-        /// </summary>
-        /// <returns>An list with the paired BluetoothDevices</returns>
+
         List<BluetoothDevices> GetAllPairedDevices();
-        /// <summary>
-        /// Open a Connection with the Bluetooth Device
-        /// </summary>
-        /// <param name="bluetoothDevice"> The device to connect </param>
         void OpenDeviceConnection(string bluetoothDeviceName);
         void CloseDeviceConnection();
         void Write(string message);
         string ReadLine();
     }
 }
+
+/// <summary>
+        /// Returns an list with all paired BluetoothDevices (Name and MAC direction)
+        /// </summary>
+        /// <returns>An list with the paired BluetoothDevices</returns>
+/// 
+///         /// <summary>
+        /// Open a Connection with the Bluetooth Device
+        /// </summary>
+        /// <param name="bluetoothDevice"> The device to connect </param>

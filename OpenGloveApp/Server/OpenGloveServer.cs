@@ -47,7 +47,9 @@ namespace OpenGloveApp.Server
                         if (webSocketByDeviceName.ContainsValue(socket) || AllSockets.Contains(socket))
                         {
                             var item = webSocketByDeviceName.First(entry => entry.Value == socket);
+                            //OpenGloveByDeviceName[item.Key].TurnOffAllOpenGloveComponents();
                             webSocketByDeviceName.Remove(item.Key);
+                            //OpenGloveByDeviceName.Remove(item.Key);
                             AllSockets.Remove(socket);
                         }
                     }

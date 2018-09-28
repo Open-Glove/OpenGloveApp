@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using OpenGloveApp.Models;
 using OpenGloveApp.Utils;
 using Xamarin.Forms;
@@ -11,6 +12,7 @@ namespace OpenGloveApp.OpenGloveAPI
         public OpenGloveConfiguration Configuration { get; set; }
         public LegacyOpenGlove LegacyOpenGlove = new LegacyOpenGlove();
         public bool IsConnected { get; set; }
+        private int MillisecondsBetweenConfigurationMessages = 1; // For fix issue lost messages to device for many messages in a short time
 
         public OpenGloveDevice(string bluetoothDeviceName)
             : base()
@@ -50,48 +52,75 @@ namespace OpenGloveApp.OpenGloveAPI
 
         public void InitializeActuators()
         {
-            if (BooleanStatements.NoNullAndCountGreaterThanZero(this.Configuration.ActuatorsByRegion))
+            new Thread(() =>
             {
-                List<int> positivePins = new List<int>();
-                List<int> negativePins = new List<int>();
-
-                foreach (Actuator actuator in this.Configuration.ActuatorsByRegion.Values)
+                Thread.CurrentThread.IsBackground = true;
+                if (BooleanStatements.NoNullAndCountGreaterThanZero(this.Configuration.ActuatorsByRegion))
                 {
-                    positivePins.Add(actuator.PositivePin);
-                    negativePins.Add(actuator.NegativePin);
-                }
+                    List<int> positivePins = new List<int>();
+                    List<int> negativePins = new List<int>();
 
-                this.LegacyOpenGlove.InitializeMotor(positivePins);
-                this.LegacyOpenGlove.InitializeMotor(negativePins);
-            }
+                    foreach (Actuator actuator in this.Configuration.ActuatorsByRegion.Values)
+                    {
+                        positivePins.Add(actuator.PositivePin);
+                        negativePins.Add(actuator.NegativePin);
+                    }
+
+                    this.LegacyOpenGlove.InitializeMotor(positivePins);
+                    Thread.Sleep(MillisecondsBetweenConfigurationMessages);
+                    this.LegacyOpenGlove.InitializeMotor(negativePins);
+                    Thread.Sleep(MillisecondsBetweenConfigurationMessages);
+                }
+            }).Start();
         }
 
         public void InitializeFlexors()
         {
-            if (BooleanStatements.NoNullAndCountGreaterThanZero(this.Configuration.FlexorsByRegion))
+            new Thread(() =>
             {
-                this.SetThreshold(this.Configuration.Threshold);
-                foreach (var flexorByRegion in this.Configuration.FlexorsByRegion)
+                Thread.CurrentThread.IsBackground = true;
+                if (BooleanStatements.NoNullAndCountGreaterThanZero(this.Configuration.FlexorsByRegion))
                 {
-                    this.LegacyOpenGlove.addFlexor(flexorByRegion.Value, flexorByRegion.Key);
+                    this.SetThreshold(this.Configuration.Threshold);
+                    foreach (var flexorByRegion in this.Configuration.FlexorsByRegion)
+                    {
+                        this.LegacyOpenGlove.addFlexor(flexorByRegion.Value, flexorByRegion.Key);
+                        Thread.Sleep(MillisecondsBetweenConfigurationMessages);
+                    }
                 }
-            }
+            }).Start();
         }
 
         public void InitializeIMU()
         {
             if (this.Configuration != null)
             {
-                this.LegacyOpenGlove.startIMU();
-                this._SetIMUChoosingData(this.Configuration.IMUChoosingData);
-                this._SetRawData(this.Configuration.IMURawData);
-                this._SetIMUStatus(this.Configuration.IMUStatus);
+                new Thread(() =>
+                {
+                    Thread.CurrentThread.IsBackground = true;
+                    this.LegacyOpenGlove.startIMU();
+                    Thread.Sleep(MillisecondsBetweenConfigurationMessages);
+                    this._SetIMUChoosingData(this.Configuration.IMUChoosingData);
+                    Thread.Sleep(MillisecondsBetweenConfigurationMessages);
+                    this._SetRawData(this.Configuration.IMURawData);
+                    Thread.Sleep(MillisecondsBetweenConfigurationMessages);
+                    this._SetIMUStatus(this.Configuration.IMUStatus);
+                    Thread.Sleep(MillisecondsBetweenConfigurationMessages);
+                }).Start();
+
             }
         }
 
         public void InitializeGlobalSettings()
         {
-            this.LegacyOpenGlove.setLoopDelay(this.Configuration.LoopDelay);
+            
+            new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+                this.LegacyOpenGlove.setLoopDelay(this.Configuration.LoopDelay);
+                Thread.Sleep(MillisecondsBetweenConfigurationMessages);
+            }
+            ).Start();
         }
 
         public void AddActuator(int region, int positivePin, int negativePin)
