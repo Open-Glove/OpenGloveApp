@@ -100,12 +100,12 @@ namespace OpenGloveApp.Server
         // Handle Message from WebSocket Client
         private void HandleMessage(IWebSocketConnection socket, string message)
         {
-            Debug.WriteLine(message);
             string[] words;             // ACTION;DEVICE;REGIONS;VALUES;EXTRA_VALUES
             int CountMessageSplit = 5;
 
             if (message != null)
             {
+                Debug.WriteLine("[OpenGloveServer.HandleMessage] new Message Received: " + message);
                 try
                 {
                     words = message.Split(';');
